@@ -5,10 +5,10 @@ from functions.lma_fun import lsq_lma
 from functions.gna_fun import lsq_gna
 
 
-class LevenbergMarquardtTest(unittest.TestCase):
+class SkewedGaussianTest(unittest.TestCase):
 
     def __init__(self, *args, **kwargs):
-        super(LevenbergMarquardtTest, self).__init__(*args, **kwargs)
+        super(SkewedGaussianTest, self).__init__(*args, **kwargs)
 
     def setUp(self):
         
