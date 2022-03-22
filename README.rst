@@ -1,5 +1,5 @@
 ==========
-Torchimize
+torchimize
 ==========
 
 Functional API Usage
