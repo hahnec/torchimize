@@ -7,7 +7,7 @@ import matplotlib.pyplot as plt
 from sklearn.model_selection import train_test_split
 import numpy as np
 
-from optimizer.gna_opt import GNA
+from torchimize.optimizer.gna_opt import GNA
 
 
 class Net(nn.Module):
