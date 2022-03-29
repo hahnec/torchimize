@@ -1,6 +1,7 @@
-import torch
-from functions.jacobian import jacobian_approx_t
+import torch 
 import functools
+
+from torchimize.functions.jacobian import jacobian_approx_t
 
 
 def lsq_lma(p, function, args=(), tol=1e-7, tau=1e-3, meth='lev', rho1=.25, rho2=.75, bet=2, gam=3, max_iter=500):
