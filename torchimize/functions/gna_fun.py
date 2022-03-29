@@ -1,6 +1,7 @@
 import torch
 import functools
-from functions.jacobian import jacobian_approx_t
+
+from torchimize.functions.jacobian import jacobian_approx_t
 
 
 def lsq_gna(p, function, args=(), l=.1, tol=1e-7, max_iter=500):
