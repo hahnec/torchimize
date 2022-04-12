@@ -31,6 +31,8 @@ class TorchimizerTest(unittest.TestCase):
     def __init__(self, *args, **kwargs):
         super(TorchimizerTest, self).__init__(*args, **kwargs)
 
+        self.plt_opt = False
+
     def setUp(self):
  
         np.random.seed(666)
@@ -79,10 +81,12 @@ class TorchimizerTest(unittest.TestCase):
         self.net.eval()
         predict = self.net(self.X_test)
         predict = predict.data.numpy()
-        plt.scatter(self.X_test.numpy(), self.y_test, label='origin')
-        plt.scatter(self.X_test.numpy(), predict, color='red', label='predict')
-        plt.legend()
-        plt.show()
+        
+        if self.plt_opt:
+            plt.scatter(self.X_test.numpy(), self.y_test, label='origin')
+            plt.scatter(self.X_test.numpy(), predict, color='red', label='predict')
+            plt.legend()
+            plt.show()
 
 
     def test_all(self):
