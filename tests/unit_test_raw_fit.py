@@ -73,7 +73,10 @@ class TorchimizerTest(unittest.TestCase):
                 loss = self.loss_func(pre, b_y)
                 self.opt.zero_grad()
                 loss.backward()
-                self.opt.step(b_x)
+                try:
+                    self.opt.step(b_x)
+                except torch._C._LinAlgError:
+                    pass
                 all_loss[epoch+1] = loss
                 print('batch: {}, loss: {}'.format(batch_idx, loss.detach().numpy().item()))
 
