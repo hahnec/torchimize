@@ -1,3 +1,4 @@
+from pyparsing import NoMatch
 import torch 
 import functools
 
@@ -41,7 +42,8 @@ def lsq_lma(p, function, args=(), tol=1e-7, tau=1e-3, meth='lev', rho1=.25, rho2
         f = fun(p)
         f_h = fun(p+h)
         rho_denom = torch.matmul(.5*h.T, u*h-g)
-        rho = (torch.matmul(f.T, f) - torch.matmul(f_h.T, f_h)) / rho_denom if rho_denom > 0 else torch.inf
+        rho_nom = (torch.matmul(f.T, f) - torch.matmul(f_h.T, f_h))
+        rho = rho_nom / rho_denom if rho_denom > 0 else torch.inf if rho_nom > 0 else -torch.inf
         if rho > 0:
             p = p + h
             p_list.append(p.detach())
