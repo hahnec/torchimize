@@ -86,7 +86,7 @@ class TorchimizerTest(unittest.TestCase):
 
 
     def test_all(self):
-        self.test_gna_opimizer()
+        self.test_gna_optimizer()
 
 
 if __name__ == '__main__':
