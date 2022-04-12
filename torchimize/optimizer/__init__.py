@@ -1,1 +1,1 @@
-from .gna_opt import GNA
+from torchimize.optimizer.gna_opt import GNA
