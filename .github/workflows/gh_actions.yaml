@@ -1,0 +1,52 @@
+name: torchimize unit tests
+# trigger workflow on push or pull requests
+on:
+  push:
+    branches:
+      - master
+      - develop
+    paths-ignore:
+      - 'docs/**'
+      - '*.rst'
+      - '*.md'
+  pull_request:
+    branches:
+      - master
+      - develop
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: 'Tag'
+        required: true
+        default: 'v0.0.0-alpha'
+
+jobs:
+  unit_test:
+    name: Unit Tests
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          ref: develop
+      - name: Install Python 3
+        uses: actions/setup-python@v1
+        with:
+          python-version: 3.8
+      - name: Install dependencies
+        run: |
+          python3 -m pip install --upgrade pip
+          python3 -m pip install setuptools
+          python3 -m pip install -r requirements.txt
+          python3 -m pip install codecov
+          python3 -m pip install coveralls
+      - name: Run headless unit tests
+        uses: GabrielBB/xvfb-action@v1
+        with:
+          run: python3 -m coverage run tests/unit_test_all.py
+      - name: Submit Coverage Report to Coveralls
+        env:
+          COVERALLS_REPO_TOKEN: ${{ secrets.COVERALLS_TOKEN }}
+        run: coveralls
