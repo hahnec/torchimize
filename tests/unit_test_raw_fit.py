@@ -6,6 +6,7 @@ import torch.utils.data as Data
 import matplotlib.pyplot as plt
 from sklearn.model_selection import train_test_split
 import numpy as np
+from pathlib import Path
 
 from torchimize.optimizer.gna_opt import GNA
 
@@ -76,7 +77,7 @@ class TorchimizerTest(unittest.TestCase):
                 all_loss[epoch+1] = loss
                 print('batch: {}, loss: {}'.format(batch_idx, loss.detach().numpy().item()))
 
-        torch.save(self.net.state_dict(), './result/raw_train_fit_model.pth')
+        torch.save(self.net.state_dict(), Path.cwd() / 'result' / 'raw_train_fit_model.pth')
 
         self.net.eval()
         predict = self.net(self.X_test)
