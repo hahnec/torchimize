@@ -16,7 +16,7 @@ class SkewedGaussianTest(unittest.TestCase):
         self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
         self.initials = torch.tensor([7.5, -.5, .5, 2.5], dtype=torch.float64, device=self.device, requires_grad=True)
-        self.cost_fun = lambda p, y: ((y-self.skewed_gaussian(p))**2)
+        self.cost_fun = lambda p, y: (y-self.skewed_gaussian(p))**2
 
         norm, mean, sigm, skew = 10, -1, 2, 5
         self.gt_params = torch.tensor([norm, mean, sigm, skew], dtype=torch.float64, device=self.device)
