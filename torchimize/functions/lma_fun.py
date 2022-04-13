@@ -4,7 +4,7 @@ import functools
 from torchimize.functions.jacobian import jacobian_approx_t
 
 
-def lsq_lma(p, function, jac_fun=None, args=(), tol=1e-7, tau=1e-3, meth='lev', rho1=.25, rho2=.75, bet=2, gam=3, max_iter=500):
+def lsq_lma(p, function, jac_function=None, args=(), tol=1e-7, tau=1e-3, meth='lev', rho1=.25, rho2=.75, bet=2, gam=3, max_iter=500):
     """
     Levenberg-Marquardt implementation for least-squares fitting of non-linear functions
     :param p: initial value(s)
@@ -29,10 +29,10 @@ def lsq_lma(p, function, jac_fun=None, args=(), tol=1e-7, tau=1e-3, meth='lev', 
         fun = function
 
     # use numerical Jacobian if analytical is not provided
-    if jac_fun is None:
+    if jac_function is None:
         jac_fun = functools.partial(jacobian_approx_t, f=fun)
     else:
-        jac_args_pos_wrapper = lambda args, p: jac_fun(p, *args)
+        jac_args_pos_wrapper = lambda args, p: jac_function(p, *args)
         jac_fun = functools.partial(jac_args_pos_wrapper, args)
 
     j = jac_fun(p)
@@ -58,7 +58,7 @@ def lsq_lma(p, function, jac_fun=None, args=(), tol=1e-7, tau=1e-3, meth='lev', 
             g = torch.matmul(j.T, fun(p))
             H = torch.matmul(j.T, j)
         if meth== 'lev':
-            u, v = (u*torch.max([1/3, 1-(2*rho-1)**3]), 2) if rho > 0 else (u*v, v*2)
+            u, v = (u*torch.max(torch.Tensor([1/3, 1-(2*rho-1)**3])), 2) if rho > 0 else (u*v, v*2)
         else:
             u = u*bet if rho < rho1 else u/gam if rho > rho2 else u
         eps = max(abs(g))

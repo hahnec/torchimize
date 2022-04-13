@@ -44,14 +44,15 @@ class SkewedGaussianTest(unittest.TestCase):
         self.assertTrue(len(coeffs) < 200, 'Number of skewed Gaussian fit iterations exceeded 200')
 
     def test_lma_skewed_gaussian(self):
+        
+        for m in ['marq', 'lev']:
+            coeffs, eps = lsq_lma(self.initials, self.cost_fun, args=(self.data_raw, None), meth=m, tol=1e-6)
 
-        coeffs, eps = lsq_lma(self.initials, self.cost_fun, args=(self.data_raw, None), meth='marq', tol=1e-6)
-
-        # assertion
-        ret_params = torch.allclose(coeffs[-1], self.gt_params, atol=1e-1)
-        self.assertTrue(ret_params, 'Skewed Gaussian coefficients deviate')
-        self.assertTrue(eps.cpu() < 1, 'Error exceeded 1')
-        self.assertTrue(len(coeffs) < 40, 'Number of skewed Gaussian fit iterations exceeded 40')
+            # assertion
+            ret_params = torch.allclose(coeffs[-1], self.gt_params, atol=1e-1)
+            self.assertTrue(ret_params, 'Skewed Gaussian coefficients deviate')
+            self.assertTrue(eps.cpu() < 1, 'Error exceeded 1')
+            self.assertTrue(len(coeffs) < 40, 'Number of skewed Gaussian fit iterations exceeded 40')
 
     def test_all(self):
         self.test_gna_skewed_gaussian()

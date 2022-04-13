@@ -4,7 +4,7 @@ import functools
 from torchimize.functions.jacobian import jacobian_approx_t
 
 
-def lsq_gna(p, function, jac_fun=None, args=(), l=1., tol=1e-7, max_iter=500):
+def lsq_gna(p, function, jac_function=None, args=(), l=1., tol=1e-7, max_iter=500):
     """
     Gauss-Newton implementation for least-squares fitting of non-linear functions
     :param p: initial value(s)
@@ -25,10 +25,10 @@ def lsq_gna(p, function, jac_fun=None, args=(), l=1., tol=1e-7, max_iter=500):
         fun = function
 
     # use numerical Jacobian if analytical is not provided
-    if jac_fun is None:
+    if jac_function is None:
         jac_fun = functools.partial(jacobian_approx_t, f=fun)
     else:
-        jac_args_pos_wrapper = lambda args, p: jac_fun(p, *args)
+        jac_args_pos_wrapper = lambda args, p: jac_function(p, *args)
         jac_fun = functools.partial(jac_args_pos_wrapper, args)
 
     j = jac_fun(p)
@@ -37,7 +37,7 @@ def lsq_gna(p, function, jac_fun=None, args=(), l=1., tol=1e-7, max_iter=500):
     eps = 1
     p_list = []
     while len(p_list) < max_iter:
-        h = -l*torch.matmul(torch.linalg.inv(H), g)
+        h = -l*torch.matmul(torch.linalg.pinv(H), g)
         p = p + h
         p_list.append(p.detach())
         j = jac_fun(p)
