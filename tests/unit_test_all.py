@@ -3,7 +3,7 @@ from tests.unit_test_skewed_gaussian import SkewedGaussianTest
 
 test_classes = [
     SkewedGaussianTest,
-    #TorchimizerTest,
+    TorchimizerTest,
                 ]
 
 for test_class in test_classes:
