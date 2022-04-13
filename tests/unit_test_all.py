@@ -2,7 +2,8 @@ from tests.unit_test_raw_fit import TorchimizerTest
 from tests.unit_test_skewed_gaussian import SkewedGaussianTest
 
 test_classes = [
-    TorchimizerTest, SkewedGaussianTest,
+    SkewedGaussianTest,
+    #TorchimizerTest,
                 ]
 
 for test_class in test_classes:

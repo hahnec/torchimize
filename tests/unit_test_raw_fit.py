@@ -80,8 +80,11 @@ class TorchimizerTest(unittest.TestCase):
                 all_loss[epoch+1] = loss
                 print('batch: {}, loss: {}'.format(batch_idx, loss.detach().numpy().item()))
 
-        torch.save(self.net.state_dict(), Path.cwd() / 'result' / 'raw_train_fit_model.pth')
-
+        try:
+            torch.save(self.net.state_dict(), Path.cwd() / 'result' / 'raw_train_fit_model.pth')
+        except FileNotFoundError:
+            pass
+        
         self.net.eval()
         predict = self.net(self.X_test)
         predict = predict.data.numpy()
