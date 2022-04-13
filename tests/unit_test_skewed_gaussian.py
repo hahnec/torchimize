@@ -16,7 +16,7 @@ class SkewedGaussianTest(unittest.TestCase):
         self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
         self.initials = torch.tensor([7.5, -.5, .5, 2.5], dtype=torch.float64, device=self.device, requires_grad=True)
-        self.cost_fun = lambda p, y: (y-self.skewed_gaussian(p))**2
+        self.cost_fun = lambda p, y, placeholder: (y-self.skewed_gaussian(p))**2
 
         norm, mean, sigm, skew = 10, -1, 2, 5
         self.gt_params = torch.tensor([norm, mean, sigm, skew], dtype=torch.float64, device=self.device)
@@ -35,7 +35,7 @@ class SkewedGaussianTest(unittest.TestCase):
 
     def test_gna_skewed_gaussian(self):
 
-        coeffs, eps = lsq_gna(self.initials, self.cost_fun, args=(self.data_raw,), tol=1e-6)
+        coeffs, eps = lsq_gna(self.initials, self.cost_fun, args=(self.data_raw, None), tol=1e-6)
 
         # assertion
         ret_params = torch.allclose(coeffs[-1], self.gt_params, atol=1e-1)
@@ -45,7 +45,7 @@ class SkewedGaussianTest(unittest.TestCase):
 
     def test_lma_skewed_gaussian(self):
 
-        coeffs, eps = lsq_lma(self.initials, self.cost_fun, args=(self.data_raw,), meth='marq', tol=1e-6)
+        coeffs, eps = lsq_lma(self.initials, self.cost_fun, args=(self.data_raw, None), meth='marq', tol=1e-6)
 
         # assertion
         ret_params = torch.allclose(coeffs[-1], self.gt_params, atol=1e-1)

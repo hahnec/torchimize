@@ -5,11 +5,12 @@ import functools
 from torchimize.functions.jacobian import jacobian_approx_t
 
 
-def lsq_lma(p, function, args=(), tol=1e-7, tau=1e-3, meth='lev', rho1=.25, rho2=.75, bet=2, gam=3, max_iter=500):
+def lsq_lma(p, function, jac_fun=None, args=(), tol=1e-7, tau=1e-3, meth='lev', rho1=.25, rho2=.75, bet=2, gam=3, max_iter=500):
     """
     Levenberg-Marquardt implementation for least-squares fitting of non-linear functions
     :param p: initial value(s)
     :param function: user-provided function which takes p (and additional arguments) as input
+    :param jac_fun: user-provided Jacobian function which takes p (and additional arguments) as input
     :param args: optional arguments passed to function
     :param tol: tolerance for stop condition
     :param tau: factor to initialize damping parameter
@@ -23,12 +24,19 @@ def lsq_lma(p, function, args=(), tol=1e-7, tau=1e-3, meth='lev', rho1=.25, rho2
     """
 
     if len(args) > 0:
-        fun_args_pos_wrapper = lambda args, p: function(p, args)
-        fun = functools.partial(fun_args_pos_wrapper, *args)
+        fun_args_pos_wrapper = lambda args, p: function(p, *args)
+        fun = functools.partial(fun_args_pos_wrapper, args)
     else:
         fun = function
 
-    j = jacobian_approx_t(p, fun)
+    # use numerical Jacobian if analytical is not provided
+    if jac_fun is None:
+        jac_fun = functools.partial(jacobian_approx_t, f=fun)
+    else:
+        jac_args_pos_wrapper = lambda args, p: jac_fun(p, *args)
+        jac_fun = functools.partial(jac_args_pos_wrapper, args)
+
+    j = jac_fun(p)
     g = torch.matmul(j.T, fun(p))
     H = torch.matmul(j.T, j)
     u = tau * torch.max(torch.diag(H.diagonal()))
@@ -47,7 +55,7 @@ def lsq_lma(p, function, args=(), tol=1e-7, tau=1e-3, meth='lev', rho1=.25, rho2
         if rho > 0:
             p = p + h
             p_list.append(p.detach())
-            j = jacobian_approx_t(p, fun)
+            j = jac_fun(p)
             g = torch.matmul(j.T, fun(p))
             H = torch.matmul(j.T, j)
         if meth== 'lev':
