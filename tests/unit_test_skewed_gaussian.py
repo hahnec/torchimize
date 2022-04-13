@@ -54,6 +54,7 @@ class SkewedGaussianTest(unittest.TestCase):
         self.assertTrue(len(coeffs) < 40, 'Number of skewed Gaussian fit iterations exceeded 40')
 
     def test_all(self):
+        self.test_gna_skewed_gaussian()
         self.test_lma_skewed_gaussian()
 
 
