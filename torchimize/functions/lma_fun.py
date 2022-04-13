@@ -4,7 +4,7 @@ import functools
 from torchimize.functions.jacobian import jacobian_approx_t
 
 
-def lsq_lma(p, function, jac_function=None, args=(), tol=1e-7, tau=1e-3, meth='lev', rho1=.25, rho2=.75, bet=2, gam=3, max_iter=500):
+def lsq_lma(p, function, jac_function=None, args=(), tol=1e-7, tau=1e-3, meth='lev', rho1=.25, rho2=.75, bet=2, gam=3, max_iter=50):
     """
     Levenberg-Marquardt implementation for least-squares fitting of non-linear functions
     :param p: initial value(s)
@@ -49,7 +49,7 @@ def lsq_lma(p, function, jac_function=None, args=(), tol=1e-7, tau=1e-3, meth='l
         f = fun(p)
         f_h = fun(p+h)
         rho_denom = torch.matmul(.5*h.T, u*h-g)
-        rho_nom = (torch.matmul(f.T, f) - torch.matmul(f_h.T, f_h))
+        rho_nom = torch.matmul(f.T, f) - torch.matmul(f_h.T, f_h)
         rho = rho_nom / rho_denom if rho_denom > 0 else torch.inf if rho_nom > 0 else -torch.inf
         if rho > 0:
             p = p + h
