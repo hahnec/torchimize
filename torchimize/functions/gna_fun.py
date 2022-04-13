@@ -4,7 +4,7 @@ import functools
 from torchimize.functions.jacobian import jacobian_approx_t
 
 
-def lsq_gna(p, function, args=(), l=.1, tol=1e-7, max_iter=500):
+def lsq_gna(p, function, args=(), l=1., tol=1e-7, max_iter=500):
     """
     Gauss-Newton implementation for least-squares fitting of non-linear functions
     :param p: initial value(s)
