@@ -4,6 +4,8 @@ torchimize
 
 *torchimize* contains implementations of the Gauss-Newton and Levenberg-Marquardt optimization algorithms using the PyTorch library. The main motivation for this project is to enable convex optimization on GPUs based on the torch.Tensor class, which (as of April 2022) is widely used in the deep learning field.
 
+[![Coverage Status](https://coveralls.io/repos/github/hahnec/torchimize/badge.svg?branch=develop)](https://coveralls.io/github/hahnec/torchimize?branch=develop)
+
 Functional API Usage
 --------------------
 
