@@ -12,7 +12,7 @@ Functional API Usage
 .. code-block:: python
 
     # gauss-newton
-    from torchimize.functions import lsq_lma
+    from torchimize.functions import lsq_gna
     coeffs_gna, eps_gna = lsq_gna(initials, cost_fun, args=(other_inputs,), tol=1e-6)
 
     # levenberg-marquardt
