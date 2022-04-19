@@ -18,15 +18,15 @@ def lsq_gna(p, function, jac_function=None, args=(), l=1., tol=1e-7, max_iter=50
 
     if len(args) > 0:
         # pass optional arguments to function
-        fun = lambda p, args=args: function(p, *args)
+        fun = lambda p: function(p, *args)
     else:
         fun = function
 
     if jac_function is None:
         # use numerical Jacobian if analytical is not provided
-        jac_fun = lambda p, f=fun: jacobian_approx_t(p, f=f)
+        jac_fun = lambda p: jacobian_approx_t(p, f=fun)
     else:
-        jac_fun = lambda p, args=args: jac_function(p, *args)
+        jac_fun = lambda p: jac_function(p, *args)
 
     j = jac_fun(p)
     g = torch.matmul(j.T, fun(p))
