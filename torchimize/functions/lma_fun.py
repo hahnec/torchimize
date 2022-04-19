@@ -51,7 +51,6 @@ def lsq_lma(p, function, jac_function=None, args=(), tol=1e-7, tau=1e-3, meth='l
         rho = rho_nom / rho_denom if rho_denom > 0 else torch.inf if rho_nom > 0 else -torch.inf
         if rho > 0:
             p = p + h
-            p_list.append(p.detach())
             j = jac_fun(p)
             g = torch.matmul(j.T, fun(p))
             H = torch.matmul(j.T, j)
@@ -60,6 +59,7 @@ def lsq_lma(p, function, jac_function=None, args=(), tol=1e-7, tau=1e-3, meth='l
         else:
             u = u*bet if rho < rho1 else u/gam if rho > rho2 else u
         eps = max(abs(g))
+        p_list.append(p.detach())
         if eps < tol:
             break
 
