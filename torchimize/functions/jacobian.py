@@ -1,3 +1,4 @@
+import re
 import torch
 
 
@@ -27,17 +28,18 @@ def jacobian_approx_loop(p, f, dp=1e-8, args=()):
     :return: jacobian
     """
 
+    n = len(p)
     if len(args) > 0:
         # pass optional arguments to function
-        fun = lambda p, args=args: function(p, *args)
+        fun = lambda p: f(p, *args)
+        jac = torch.zeros([n, len(args[0])], dtype=p.dtype, device=p.device)
     else:
         fun = f
+        jac = torch.zeros(n, dtype=p.dtype, device=p.device)
 
-    n = len(p)
-    jac = torch.zeros(n) if len(args) == 0 else torch.zeros([n, len(args[0])])
     for j in range(n):
         dpj = abs(p[j]) * dp if p[j] != 0 else dp
-        p_plus = [(pi if k != j else pi + dpj) for k, pi in enumerate(p)]
+        p_plus = torch.Tensor([(pi if k != j else pi + dpj) for k, pi in enumerate(p)]).to(p.device)
         jac[j] = (fun(p_plus) - fun(p)) / dpj
 
     return jac if len(args) == 0 else jac.T
