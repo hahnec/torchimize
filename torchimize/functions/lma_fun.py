@@ -54,12 +54,12 @@ def lsq_lma(p, function, jac_function=None, args=(), tol=1e-7, tau=1e-3, meth='l
             j = jac_fun(p)
             g = torch.matmul(j.T, fun(p))
             H = torch.matmul(j.T, j)
+        p_list.append(p.detach())
         if meth== 'lev':
             u, v = (u*torch.max(torch.Tensor([1/3, 1-(2*rho-1)**3])), 2) if rho > 0 else (u*v, v*2)
         else:
             u = u*bet if rho < rho1 else u/gam if rho > rho2 else u
         eps = max(abs(g))
-        p_list.append(p.detach())
         if eps < tol:
             break
 
