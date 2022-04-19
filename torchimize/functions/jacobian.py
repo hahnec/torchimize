@@ -1,5 +1,4 @@
 import torch
-import functools
 
 
 def jacobian_approx_t(p, f):
@@ -29,8 +28,8 @@ def jacobian_approx_loop(p, f, dp=1e-8, args=()):
     """
 
     if len(args) > 0:
-        fun_args_pos_wrapper = lambda args, p: f(p, *args)
-        fun = functools.partial(fun_args_pos_wrapper, args)
+        # pass optional arguments to function
+        fun = lambda p, args=args: function(p, *args)
     else:
         fun = f
 

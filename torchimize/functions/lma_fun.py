@@ -1,5 +1,4 @@
 import torch 
-import functools
 
 from torchimize.functions.jacobian import jacobian_approx_t
 
@@ -23,17 +22,16 @@ def lsq_lma(p, function, jac_function=None, args=(), tol=1e-7, tau=1e-3, meth='l
     """
 
     if len(args) > 0:
-        fun_args_pos_wrapper = lambda args, p: function(p, *args)
-        fun = functools.partial(fun_args_pos_wrapper, args)
+        # pass optional arguments to function
+        fun = lambda p, args=args: function(p, *args)
     else:
         fun = function
 
-    # use numerical Jacobian if analytical is not provided
     if jac_function is None:
-        jac_fun = functools.partial(jacobian_approx_t, f=fun)
+        # use numerical Jacobian if analytical is not provided
+        jac_fun = lambda p, f=fun: jacobian_approx_t(p, f=f)
     else:
-        jac_args_pos_wrapper = lambda args, p: jac_function(p, *args)
-        jac_fun = functools.partial(jac_args_pos_wrapper, args)
+        jac_fun = lambda p, args=args: jac_function(p, *args)
 
     j = jac_fun(p)
     g = torch.matmul(j.T, fun(p))
