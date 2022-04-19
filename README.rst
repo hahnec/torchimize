@@ -6,6 +6,10 @@ torchimize
 
 .. image:: https://coveralls.io/repos/github/hahnec/torchimize/badge.svg?branch=master
 
+.. image:: https://img.shields.io/github/workflow/status/hahnec/torchimize/torchimize%20unit%20tests/master?label=tests%20on%20master
+
+.. image:: https://img.shields.io/github/workflow/status/hahnec/torchimize/torchimize%20unit%20tests/develop?label=tests%20on%20develop
+
 Functional API Usage
 --------------------
 
