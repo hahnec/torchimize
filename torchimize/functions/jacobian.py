@@ -1,5 +1,5 @@
-import numpy as np
 import torch
+import functools
 
 
 def jacobian_approx_t(p, f):
@@ -18,7 +18,7 @@ def jacobian_approx_t(p, f):
     return jac
 
 
-def jacobian_approx_np(p, f, dp=1e-8, args=()):
+def jacobian_approx_loop(p, f, dp=1e-8, args=()):
     """
     Numerical approximation for the multivariate Jacobian
     :param p: initial value(s)
@@ -28,12 +28,17 @@ def jacobian_approx_np(p, f, dp=1e-8, args=()):
     :return: jacobian
     """
 
+    if len(args) > 0:
+        fun_args_pos_wrapper = lambda args, p: f(p, *args)
+        fun = functools.partial(fun_args_pos_wrapper, args)
+    else:
+        fun = f
+
     n = len(p)
-    jac = np.zeros(n) if len(args) == 0 else np.zeros([n, len(args[0])])
-    for j in range(n):  # through columns to allow for vector addition
+    jac = torch.zeros(n) if len(args) == 0 else torch.zeros([n, len(args[0])])
+    for j in range(n):
         dpj = abs(p[j]) * dp if p[j] != 0 else dp
         p_plus = [(pi if k != j else pi + dpj) for k, pi in enumerate(p)]
-        # compute jacobian while passing optional arguments
-        jac[j] = (f(*((p_plus,) + args)) - f(*((p,) + args))) / dpj
+        jac[j] = (fun(p_plus) - fun(p)) / dpj
 
     return jac if len(args) == 0 else jac.T
