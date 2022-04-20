@@ -37,7 +37,7 @@ def lsq_lma(p, function, jac_function=None, args=(), tol=1e-7, tau=1e-3, meth='l
     j = jac_fun(p)
     g = torch.matmul(j.T, f)
     H = torch.matmul(j.T, j)
-    u = tau * torch.max(torch.diag(H.diagonal()))
+    u = tau * torch.max(torch.diag(H))
     v = 2
     eps = 1
     p_list = []
@@ -47,7 +47,7 @@ def lsq_lma(p, function, jac_function=None, args=(), tol=1e-7, tau=1e-3, meth='l
         h = -torch.matmul(torch.linalg.inv(H+u*D), g)
         f = fun(p)
         f_h = fun(p+h)
-        rho_denom = torch.matmul(.5*h, u*h-g)
+        rho_denom = torch.matmul(h, u*h-g)
         rho_nom = torch.matmul(f, f) - torch.matmul(f_h, f_h)
         rho = rho_nom / rho_denom if rho_denom > 0 else torch.inf if rho_nom > 0 else -torch.inf
         if rho > 0:
