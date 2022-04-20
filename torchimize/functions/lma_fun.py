@@ -3,7 +3,7 @@ import torch
 from torchimize.functions.jacobian import jacobian_approx_t
 
 
-def lsq_lma(p, function, jac_function=None, args=(), tol=1e-7, tau=1e-3, meth='lev', rho1=.25, rho2=.75, bet=2, gam=3, max_iter=50):
+def lsq_lma(p, function, jac_function=None, args=(), tol=1e-7, tau=1e-3, meth='lev', rho1=.25, rho2=.75, bet=2, gam=3, max_iter=50, xtol=1e-8):
     """
     Levenberg-Marquardt implementation for least-squares fitting of non-linear functions
     :param p: initial value(s)
@@ -18,6 +18,7 @@ def lsq_lma(p, function, jac_function=None, args=(), tol=1e-7, tau=1e-3, meth='l
     :param bet: multiplier for damping parameter adjustment for Marquardt
     :param gam: divisor for damping parameter adjustment for Marquardt
     :param max_iter: maximum number of iterations
+    :param xtol: relative change in independant variables
     :return: list of results, eps
     """
 
@@ -62,6 +63,8 @@ def lsq_lma(p, function, jac_function=None, args=(), tol=1e-7, tau=1e-3, meth='l
             u = u*bet if rho < rho1 else u/gam if rho > rho2 else u
         eps = max(abs(g))
         if eps < tol:
+            break
+        if torch.linalg.norm(h,ord=2) < xtol*(xtol + torch.linalg.norm(p,ord=2)):
             break
 
     return p_list, eps
