@@ -1,4 +1,3 @@
-import numpy as np
 import torch
 
 
@@ -18,7 +17,7 @@ def jacobian_approx_t(p, f):
     return jac
 
 
-def jacobian_approx_np(p, f, dp=1e-8, args=()):
+def jacobian_approx_loop(p, f, dp=1e-8, args=()):
     """
     Numerical approximation for the multivariate Jacobian
     :param p: initial value(s)
@@ -29,11 +28,17 @@ def jacobian_approx_np(p, f, dp=1e-8, args=()):
     """
 
     n = len(p)
-    jac = np.zeros(n) if len(args) == 0 else np.zeros([n, len(args[0])])
-    for j in range(n):  # through columns to allow for vector addition
+    if len(args) > 0:
+        # pass optional arguments to function
+        fun = lambda p: f(p, *args)
+        jac = torch.zeros([n, len(args[0])], dtype=p.dtype, device=p.device)
+    else:
+        fun = f
+        jac = torch.zeros(n, dtype=p.dtype, device=p.device)
+
+    for j in range(n):
         dpj = abs(p[j]) * dp if p[j] != 0 else dp
-        p_plus = [(pi if k != j else pi + dpj) for k, pi in enumerate(p)]
-        # compute jacobian while passing optional arguments
-        jac[j] = (f(*((p_plus,) + args)) - f(*((p,) + args))) / dpj
+        p_plus = torch.Tensor([(pi if k != j else pi + dpj) for k, pi in enumerate(p)]).to(p.device)
+        jac[j] = (fun(p_plus) - fun(p)) / dpj
 
     return jac if len(args) == 0 else jac.T

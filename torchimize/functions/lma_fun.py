@@ -1,5 +1,4 @@
 import torch 
-import functools
 
 from torchimize.functions.jacobian import jacobian_approx_t
 
@@ -23,17 +22,16 @@ def lsq_lma(p, function, jac_function=None, args=(), tol=1e-7, tau=1e-3, meth='l
     """
 
     if len(args) > 0:
-        fun_args_pos_wrapper = lambda args, p: function(p, *args)
-        fun = functools.partial(fun_args_pos_wrapper, args)
+        # pass optional arguments to function
+        fun = lambda p: function(p, *args)
     else:
         fun = function
 
-    # use numerical Jacobian if analytical is not provided
     if jac_function is None:
-        jac_fun = functools.partial(jacobian_approx_t, f=fun)
+        # use numerical Jacobian if analytical is not provided
+        jac_fun = lambda p: jacobian_approx_t(p, f=fun)
     else:
-        jac_args_pos_wrapper = lambda args, p: jac_function(p, *args)
-        jac_fun = functools.partial(jac_args_pos_wrapper, args)
+        jac_fun = lambda p: jac_function(p, *args)
 
     f = fun(p)
     j = jac_fun(p)
@@ -49,15 +47,15 @@ def lsq_lma(p, function, jac_function=None, args=(), tol=1e-7, tau=1e-3, meth='l
         h = -torch.matmul(torch.linalg.inv(H+u*D), g)
         f = fun(p)
         f_h = fun(p+h)
-        rho_denom = torch.matmul(.5*h.T, u*h-g)
-        rho_nom = torch.matmul(f.T, f) - torch.matmul(f_h.T, f_h)
+        rho_denom = torch.matmul(.5*h, u*h-g)
+        rho_nom = torch.matmul(f, f) - torch.matmul(f_h, f_h)
         rho = rho_nom / rho_denom if rho_denom > 0 else torch.inf if rho_nom > 0 else -torch.inf
         if rho > 0:
             p = p + h
-            p_list.append(p.detach())
             j = jac_fun(p)
             g = torch.matmul(j.T, fun(p))
             H = torch.matmul(j.T, j)
+        p_list.append(p.detach())
         if meth== 'lev':
             u, v = (u*torch.max(torch.Tensor([1/3, 1-(2*rho-1)**3])), 2) if rho > 0 else (u*v, v*2)
         else:
