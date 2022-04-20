@@ -35,8 +35,9 @@ def lsq_lma(p, function, jac_function=None, args=(), tol=1e-7, tau=1e-3, meth='l
         jac_args_pos_wrapper = lambda args, p: jac_function(p, *args)
         jac_fun = functools.partial(jac_args_pos_wrapper, args)
 
+    f = fun(p)
     j = jac_fun(p)
-    g = torch.matmul(j.T, fun(p))
+    g = torch.matmul(j.T, f)
     H = torch.matmul(j.T, j)
     u = tau * torch.max(torch.diag(H.diagonal()))
     v = 2
