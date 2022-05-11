@@ -8,8 +8,9 @@ def lsq_lma(
         function, 
         jac_function=None, 
         args=(), 
-        gtol=1e-7,
+        ftol=1e-8,
         ptol=1e-8,
+        gtol=1e-8,
         tau=1e-3, 
         meth='lev',
         rho1=.25, 
@@ -23,8 +24,9 @@ def lsq_lma(
     :param function: user-provided function which takes p (and additional arguments) as input
     :param jac_fun: user-provided Jacobian function which takes p (and additional arguments) as input
     :param args: optional arguments passed to function
-    :param gtol: gradient tolerance for stop condition
-    :param ptol: relative change in independant variables
+    :param ftol: relative change in cost function as stop condition
+    :param ptol: relative change in independant variables as stop condition
+    :param gtol: maximum gradient tolerance as stop condition
     :param tau: factor to initialize damping parameter
     :param meth: method which is default 'lev' for Levenberg and otherwise Marquardt
     :param rho1: first gain factor threshold for damping parameter adjustment for Marquardt
@@ -53,7 +55,6 @@ def lsq_lma(
     H = torch.matmul(j.T, j)
     u = tau * torch.max(torch.diag(H))
     v = 2
-    eps = 1
     p_list = []
     while len(p_list) < max_iter:
         D = torch.eye(j.shape[1], device=j.device)
@@ -76,10 +77,10 @@ def lsq_lma(
             u = u*bet if rho < rho1 else u/gam if rho > rho2 else u
 
         # stop conditions
-        eps = max(abs(g))
-        if eps < gtol:
-            break
-        if sum(h**2)**.5 < ptol*(ptol + sum(p**2)**.5):
+        gcon = max(abs(g)) < gtol
+        pcon = sum(h**2)**.5 < ptol*(ptol + sum(p**2)**.5)
+        fcon = ((fun(p_list[-2])-fun(p_list[-1]))**2).sum() < ((ftol*f)**2).sum()
+        if gcon or pcon or fcon:
             break
 
-    return p_list, eps
+    return p_list
