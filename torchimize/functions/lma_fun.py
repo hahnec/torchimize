@@ -1,22 +1,24 @@
 import torch 
+from typing import Union, Callable, List, Tuple
 
 from torchimize.functions.jacobian import jacobian_approx_t
 
 
 def lsq_lma(
-        p, 
-        function, 
-        jac_function=None, 
-        args=(), 
-        ftol=1e-8,
-        ptol=1e-8,
-        gtol=1e-8,
-        tau=1e-3, 
-        meth='lev',
-        rho1=.25, 
-        rho2=.75, bet=2, 
-        gam=3, 
-        max_iter=50, 
+        p: torch.Tensor,
+        function: Callable, 
+        jac_function: Callable = None, 
+        args: Union[Tuple, List] = (), 
+        ftol: float = 1e-8,
+        ptol: float = 1e-8,
+        gtol: float = 1e-8,
+        tau: float = 1e-3, 
+        meth: str = 'lev',
+        rho1: float=.25, 
+        rho2: float = .75, 
+        bet: float = 2, 
+        gam: float = 3, 
+        max_iter: int = 100, 
     ):
     """
     Levenberg-Marquardt implementation for least-squares fitting of non-linear functions
