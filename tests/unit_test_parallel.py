@@ -5,13 +5,13 @@ from torchimize.functions.lma_fun import lsq_lma
 from torchimize.functions.gna_fun import lsq_gna
 from tests.emg_mm import *
 
-class JacobianFunctionTest(unittest.TestCase):
+class ParallelOptimizationTest(unittest.TestCase):
 
     def __init__(self, *args, **kwargs):
-        super(JacobianFunctionTest, self).__init__(*args, **kwargs)
+        super(ParallelOptimizationTest, self).__init__(*args, **kwargs)
 
     def setUp(self):
-
+        
         torch.seed()
         self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
@@ -22,8 +22,11 @@ class JacobianFunctionTest(unittest.TestCase):
 
         self.gt_params = torch.tensor([norm, mean, sigm, skew], dtype=torch.float64, device=self.device)
         self.t = torch.linspace(-1e3, 1e3, int(2e3)).to(self.device)
-        self.data = self.emg_model(self.gt_params, t=self.t)
-        self.data_raw = self.data + .01 * torch.randn(len(self.data), dtype=torch.float64, device=self.device)
+        channel_num = 4
+        self.data_channels = []
+        for i in range(channel_num):
+            data = self.emg_model(self.gt_params, t=self.t)
+            self.data_channels.append(data + .01 * torch.randn(len(data), dtype=torch.float64, device=self.device))
 
     @staticmethod
     def emg_model(
@@ -56,7 +59,7 @@ class JacobianFunctionTest(unittest.TestCase):
 
     def test_gna_emg(self):
 
-        coeffs, eps = lsq_gna(self.initials, self.cost_fun, jac_function=self.emg_jac, args=(self.t, self.data_raw), l=.1, gtol=1e-6, max_iter=199)
+        coeffs, eps = lsq_gna(self.initials, self.cost_fun, jac_function=self.emg_jac, args=(self.t, self.data_channels), l=.1, gtol=1e-6, max_iter=199)
 
         # assertion
         ret_params = torch.allclose(coeffs[-1], self.gt_params, atol=1e-1)
@@ -66,7 +69,7 @@ class JacobianFunctionTest(unittest.TestCase):
 
     def test_lma_emg(self):
 
-        coeffs, eps = lsq_lma(self.initials, self.cost_fun, jac_function=self.emg_jac, args=(self.t, self.data_raw), meth='marq', gtol=1e-6, max_iter=39)
+        coeffs, eps = lsq_lma(self.initials, self.cost_fun, jac_function=self.emg_jac, args=(self.t, self.data_channels), meth='marq', gtol=1e-6, max_iter=39)
 
         # assertion
         ret_params = torch.allclose(coeffs[-1], self.gt_params, atol=1e-1)
