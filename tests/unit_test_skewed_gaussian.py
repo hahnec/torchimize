@@ -36,7 +36,7 @@ class SkewedGaussianTest(unittest.TestCase):
 
     def test_gna_skewed_gaussian(self):
 
-        coeffs, eps = lsq_gna(self.initials, self.cost_fun, args=(self.data_raw, None), tol=1e-6, max_iter=199)
+        coeffs, eps = lsq_gna(self.initials, self.cost_fun, args=(self.data_raw, None), gtol=1e-6, max_iter=199)
 
         # assertion
         ret_params = torch.allclose(coeffs[-1], self.gt_params, atol=1e-1)
@@ -47,7 +47,7 @@ class SkewedGaussianTest(unittest.TestCase):
     def test_lma_skewed_gaussian(self):
         
         for m in ['marq', 'lev']:
-            coeffs, eps = lsq_lma(self.initials, self.cost_fun, args=(self.data_raw, None), meth=m, tol=1e-6, max_iter=49)
+            coeffs, eps = lsq_lma(self.initials, self.cost_fun, args=(self.data_raw, None), meth=m, gtol=1e-6, max_iter=49)
 
             # assertion
             ret_params = torch.allclose(coeffs[-1], self.gt_params, atol=1e-1)

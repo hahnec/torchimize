@@ -3,7 +3,16 @@ import torch
 from torchimize.functions.jacobian import jacobian_approx_t
 
 
-def lsq_gna(p, function, jac_function=None, args=(), l=1., tol=1e-7, max_iter=50):
+def lsq_gna(
+        p, 
+        function, 
+        jac_function=None, 
+        args=(), 
+        l=1.,
+        gtol=1e-7,
+        ptol=1e-8,
+        max_iter=50,
+    ):
     """
     Gauss-Newton implementation for least-squares fitting of non-linear functions
     :param p: initial value(s)
@@ -11,7 +20,8 @@ def lsq_gna(p, function, jac_function=None, args=(), l=1., tol=1e-7, max_iter=50
     :param jac_fun: user-provided Jacobian function which takes p (and additional arguments) as input
     :param args: optional arguments passed to function
     :param l: learning rate
-    :param tol: tolerance for stop condition
+    :param gtol: gradient tolerance for stop condition
+    :param ptol: relative change in independant variables
     :param max_iter: maximum number of iterations
     :return: list of results, eps
     """
@@ -41,6 +51,8 @@ def lsq_gna(p, function, jac_function=None, args=(), l=1., tol=1e-7, max_iter=50
         g = torch.matmul(j.T, fun(p))
         H = torch.matmul(j.T, j)
         eps = max(abs(g))
-        if eps < tol:
+        if eps < gtol:
+            break
+        if sum(h**2)**.5 < ptol*(ptol + sum(p**2)**.5):
             break
     return p_list, eps
