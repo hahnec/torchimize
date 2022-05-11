@@ -58,7 +58,7 @@ def lsq_gna(
 
         # stop conditions
         gcon = max(abs(g)) < gtol
-        pcon = sum(h**2)**.5 < ptol*(ptol + sum(p**2)**.5)
+        pcon = (h**2).sum()**.5 < ptol*(ptol + (p**2).sum()**.5)
         fcon = ((fun(p_list[-2])-fun(p_list[-1]))**2).sum() < ((ftol*f)**2).sum()
         if gcon or pcon or fcon:
             break
