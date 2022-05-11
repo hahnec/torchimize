@@ -59,20 +59,20 @@ class SkewedGaussianTest(unittest.TestCase):
 
         # attach arguments to cost function and numerical jacobian
         wrapped_cost_fun = lambda p, y: self.cost_fun(p, y, placeholder=None)
-        jac_fun = lambda p, args: jacobian_approx_loop(p, f=wrapped_cost_fun, dp=1e-9, args=(args,))
+        jac_fun = lambda p, args: jacobian_approx_loop(p, f=wrapped_cost_fun, dp=1e-6, args=(args,))
 
         jac_mat = jac_fun(p=self.initials, args=self.data_raw)
-        
+
         self.assertEqual(jac_mat.shape, torch.Size([len(self.data_raw), len(self.gt_params)]), 'Numerical Jacobian is of wrong dimensions')
         self.assertTrue(torch.sum(jac_mat.isnan()) == 0, 'NaNs in Jacobian')
 
-        coeffs, eps = lsq_lma(self.initials, wrapped_cost_fun, jac_function=jac_fun, args=(self.data_raw,), meth='marq', tol=1e-6)
+        coeffs, eps = lsq_lma(self.initials, wrapped_cost_fun, jac_function=jac_fun, args=(self.data_raw,), meth='marq', gtol=1e-6, max_iter=39)
 
         # assertion
-        #ret_params = torch.allclose(coeffs[-1], self.gt_params, atol=1e-1)
-        #self.assertTrue(ret_params, 'Skewed Gaussian coefficients deviate')
-        #self.assertTrue(eps.cpu() < 1, 'Error exceeded 1')
-        #self.assertTrue(len(coeffs) < 40, 'Number of skewed Gaussian fit iterations exceeded 40')
+        ret_params = torch.allclose(coeffs[-1], self.gt_params, atol=1e-1)
+        self.assertTrue(ret_params, 'Skewed Gaussian coefficients deviate')
+        self.assertTrue(eps.cpu() < 1, 'Error exceeded 1')
+        self.assertTrue(len(coeffs) < 40, 'Number of skewed Gaussian fit iterations exceeded 40')
 
     def test_all(self):
         self.test_gna_skewed_gaussian()
