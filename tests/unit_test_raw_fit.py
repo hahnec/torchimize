@@ -53,7 +53,7 @@ class TorchimizerTest(unittest.TestCase):
         torch.manual_seed(3008)
 
         X = torch.linspace(-1, 1, 1000)
-        y = X**2 + 0.1 * torch.normal(0, 1, size=(10,))
+        y = X**2 + 0.1 * torch.normal(0, 1, size=(X.size,))
         print(X.shape)
         print(y.shape)
 
