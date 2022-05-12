@@ -59,7 +59,7 @@ def lsq_gna(
 
     f = fun(p)
     j = jac_fun(p)
-    g = torch.matmul(j.T, )
+    g = torch.matmul(j.T, f)
     H = torch.matmul(j.T, j)
     eps = 1
     p_list = []
