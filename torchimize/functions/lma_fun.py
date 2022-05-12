@@ -73,7 +73,7 @@ def lsq_lma(
     H = torch.matmul(j.T, j)
     u = tau * torch.max(torch.diag(H))
     v = 2
-    p_list = []
+    p_list = [p]
     while len(p_list) < max_iter:
         D = torch.eye(j.shape[1], device=j.device)
         D *= 1 if meth == 'lev' else torch.max(torch.maximum(H.diagonal(), D.diagonal()))

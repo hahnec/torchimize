@@ -62,7 +62,7 @@ def lsq_gna(
     g = torch.matmul(j.T, f)
     H = torch.matmul(j.T, j)
     eps = 1
-    p_list = []
+    p_list = [p]
     while len(p_list) < max_iter:
         h = -l*torch.matmul(torch.linalg.pinv(H), g)
         p = p + h
