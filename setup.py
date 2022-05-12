@@ -21,14 +21,6 @@ from torchimize import __version__
 from docutils import core
 from pathlib import Path
 
-OPTIONS = {
-    "argv_emulation": True,
-    "compressed": True,
-    "optimize": 2,
-    "excludes": ['matplotlib'],
-    "plist": dict(NSHumanReadableCopyright='2022 Christopher Hahne'),
-    "packages": ['torch'],
-}
 
 path = Path.cwd()
 # parse description section text
@@ -54,8 +46,6 @@ setup(
       author_email='inbox@christopherhahne.de',
       license='GNU GPL V3.0',
       keywords='pytorch torch optimization mathematical linear programming gauss newton levenberg marquardt',
-      scripts=[''],
-      entry_points={'console_scripts': [''],},
       packages=find_packages(),
       install_requires=req_list,
       include_package_data=True,
