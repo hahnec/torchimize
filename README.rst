@@ -2,12 +2,17 @@
 torchimize
 ==========
 
-*torchimize* contains implementations of the Gauss-Newton and Levenberg-Marquardt optimization algorithms using the PyTorch library. The main motivation for this project is to enable convex optimization on GPUs based on the torch.Tensor class, which (as of April 2022) is widely used in the deep learning field.
+..
 
-|coverage| |tests_develop| |tests_master|
+Description
+===========
+
+*torchimize* contains implementations of the Gauss-Newton and Levenberg-Marquardt optimization algorithms using the PyTorch library. The main motivation for this project is to enable convex optimization on GPUs based on the torch.Tensor class, which (as of 2022) is widely used in the deep learning field. This enables to minimize several least-squares optimization problems per loop iteration simultaneously.
+
+|coverage| |tests_develop| |tests_master| |license|
 
 Functional API Usage
---------------------
+====================
 
 .. code-block:: python
 
@@ -30,3 +35,7 @@ Functional API Usage
 
 .. |tests_master| image:: https://img.shields.io/github/workflow/status/hahnec/torchimize/torchimize%20unit%20tests/master?label=tests%20on%20master
     :target: https://github.com/hahnec/torchimize/actions/
+
+.. |license| image:: https://img.shields.io/badge/License-GPL%20v3.0-orange.svg?style=flat-square
+    :target: https://www.gnu.org/licenses/gpl-3.0.en.html
+    :alt: License

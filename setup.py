@@ -19,7 +19,7 @@ __license__ = """
 from setuptools import setup, find_packages
 from torchimize import __version__
 from docutils import core
-import os
+from pathlib import Path
 
 OPTIONS = {
     "argv_emulation": True,
@@ -30,10 +30,9 @@ OPTIONS = {
     "packages": ['torch'],
 }
 
-path = os.path.dirname(os.path.realpath(__file__))
+path = Path.cwd()
 # parse description section text
-readme_path = os.path.join(path, 'README.rst')
-with open(readme_path, 'r') as f:
+with open(str(path / 'README.rst'), 'r') as f:
     data = f.read()
     readme_nodes = list(core.publish_doctree(data))
     for node in readme_nodes:
@@ -41,8 +40,7 @@ with open(readme_path, 'r') as f:
                 long_description = node.astext().rsplit('\n\n')[1]
 
 # parse package requirements from text file
-reqtxt_path = os.path.join(path, 'requirements.txt')
-with open(reqtxt_path, 'r') as f:
+with open(str(path / 'requirements.txt'), 'r') as f:
     req_list = f.read().split('\n')
 
 setup(
