@@ -35,7 +35,7 @@ def lsq_lma(
         bet: float = 2, 
         gam: float = 3, 
         max_iter: int = 100, 
-    ):
+    ) -> List[torch.Tensor]:
     """
     Levenberg-Marquardt implementation for least-squares fitting of non-linear functions
     :param p: initial value(s)

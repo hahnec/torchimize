@@ -30,7 +30,7 @@ def lsq_gna(
         gtol: float = 1e-8,
         l: float = 1.,
         max_iter: int = 100,
-    ):
+    ) -> List[torch.Tensor]:
     """
     Gauss-Newton implementation for least-squares fitting of non-linear functions
     :param p: initial value(s)
