@@ -61,7 +61,6 @@ def lsq_gna(
     j = jac_fun(p)
     g = torch.matmul(j.T, f)
     H = torch.matmul(j.T, j)
-    eps = 1
     p_list = [p]
     while len(p_list) < max_iter:
         h = -l*torch.matmul(torch.linalg.pinv(H), g)
@@ -79,4 +78,4 @@ def lsq_gna(
         if gcon or pcon or fcon:
             break
 
-    return p_list, eps
+    return p_list

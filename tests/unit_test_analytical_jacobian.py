@@ -72,21 +72,23 @@ class JacobianFunctionTest(unittest.TestCase):
 
     def test_gna_emg(self):
 
-        coeffs, eps = lsq_gna(self.initials, self.cost_fun, jac_function=self.emg_jac, args=(self.t, self.data_raw), l=.1, gtol=1e-6, max_iter=199)
+        coeffs = lsq_gna(self.initials, self.cost_fun, jac_function=self.emg_jac, args=(self.t, self.data_raw), l=.1, gtol=1e-6, max_iter=199)
 
         # assertion
         ret_params = torch.allclose(coeffs[-1], self.gt_params, atol=1e-1)
         self.assertTrue(ret_params, 'Coefficients deviate')
+        eps = torch.sum(self.cost_fun(coeffs[-1], t=self.t, y=self.data_raw))
         self.assertTrue(eps.cpu() < 1, 'Error exceeded 1')
         self.assertTrue(len(coeffs) < 200, 'Number of iterations exceeded 200')
 
     def test_lma_emg(self):
 
-        coeffs, eps = lsq_lma(self.initials, self.cost_fun, jac_function=self.emg_jac, args=(self.t, self.data_raw), meth='marq', gtol=1e-6, max_iter=39)
+        coeffs = lsq_lma(self.initials, self.cost_fun, jac_function=self.emg_jac, args=(self.t, self.data_raw), meth='marq', gtol=1e-6, max_iter=39)
 
         # assertion
         ret_params = torch.allclose(coeffs[-1], self.gt_params, atol=1e-1)
         self.assertTrue(ret_params, 'Coefficients deviate')
+        eps = torch.sum(self.cost_fun(coeffs[-1], t=self.t, y=self.data_raw))
         self.assertTrue(eps.cpu() < 1, 'Error exceeded 1')
         self.assertTrue(len(coeffs) < 40, 'Number of iterations exceeded 40')
 
