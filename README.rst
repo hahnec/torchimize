@@ -36,6 +36,6 @@ Functional API Usage
 .. |tests_master| image:: https://img.shields.io/github/workflow/status/hahnec/torchimize/torchimize%20unit%20tests/master?label=tests%20on%20master
     :target: https://github.com/hahnec/torchimize/actions/
 
-.. |license| image:: https://img.shields.io/badge/License-GPL%20v3.0-orange.svg?style=flat-square
+.. |license| image:: https://img.shields.io/badge/License-GPL%20v3.0-orange.svg
     :target: https://www.gnu.org/licenses/gpl-3.0.en.html
     :alt: License
