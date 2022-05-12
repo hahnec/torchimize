@@ -89,15 +89,15 @@ def lsq_lma(
             g = torch.matmul(j.T, fun(p))
             H = torch.matmul(j.T, j)
         p_list.append(p.detach())
-        if meth== 'lev':
-            u, v = (u*torch.max(torch.Tensor([1/3, 1-(2*rho-1)**3])), 2) if rho > 0 else (u*v, v*2)
+        if meth == 'lev':
+            u, v = (u*torch.max(torch.tensor([1/3, 1-(2*rho-1)**3])), 2) if rho > 0 else (u*v, v*2)
         else:
             u = u*bet if rho < rho1 else u/gam if rho > rho2 else u
 
         # stop conditions
         gcon = max(abs(g)) < gtol
         pcon = (h**2).sum()**.5 < ptol*(ptol + (p**2).sum()**.5)
-        fcon = ((fun(p_list[-2])-fun(p_list[-1]))**2).sum() < ((ftol*f)**2).sum()
+        fcon = ((fun(p_list[-2])-fun(p_list[-1]))**2).sum() < ((ftol*f)**2).sum() if rho > 0 else False
         if gcon or pcon or fcon:
             break
 
