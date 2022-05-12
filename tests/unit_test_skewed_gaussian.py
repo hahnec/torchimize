@@ -56,9 +56,9 @@ class SkewedGaussianTest(unittest.TestCase):
 
         # assertion
         ret_params = torch.allclose(coeffs[-1], self.gt_params, atol=1e-1)
-        eps = torch.sum(self.cost_fun(coeffs[-1], y=self.data_raw, placeholder=None))
         self.assertTrue(ret_params, 'Skewed Gaussian coefficients deviate')
-        self.assertTrue(eps.cpu() < .1, 'Error exceeded 1')
+        eps = torch.sum(self.cost_fun(coeffs[-1], y=self.data_raw, placeholder=None))
+        self.assertTrue(eps.cpu() < .1, 'Error exceeded')
         self.assertTrue(len(coeffs) < 200, 'Number of skewed Gaussian fit iterations exceeded 200')
 
     def test_lma_skewed_gaussian(self):
@@ -70,7 +70,7 @@ class SkewedGaussianTest(unittest.TestCase):
             ret_params = torch.allclose(coeffs[-1], self.gt_params, atol=1e-1)
             self.assertTrue(ret_params, 'Skewed Gaussian coefficients deviate')
             eps = torch.sum(self.cost_fun(coeffs[-1], y=self.data_raw, placeholder=None))
-            self.assertTrue(eps.cpu() < .1, 'Error exceeded 1')
+            self.assertTrue(eps.cpu() < .1, 'Error exceeded')
             self.assertTrue(len(coeffs) < 50, 'Number of skewed Gaussian fit iterations exceeded 50')
 
     def test_jac_skewed_gaussian(self):

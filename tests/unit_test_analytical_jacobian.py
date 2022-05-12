@@ -78,7 +78,7 @@ class JacobianFunctionTest(unittest.TestCase):
         ret_params = torch.allclose(coeffs[-1], self.gt_params, atol=1e-1)
         self.assertTrue(ret_params, 'Coefficients deviate')
         eps = torch.sum(self.cost_fun(coeffs[-1], t=self.t, y=self.data_raw))
-        self.assertTrue(eps.cpu() < 1, 'Error exceeded 1')
+        self.assertTrue(eps.cpu() < 1, 'Error exceeded')
         self.assertTrue(len(coeffs) < 200, 'Number of iterations exceeded 200')
 
     def test_lma_emg(self):
@@ -89,7 +89,7 @@ class JacobianFunctionTest(unittest.TestCase):
         ret_params = torch.allclose(coeffs[-1], self.gt_params, atol=1e-1)
         self.assertTrue(ret_params, 'Coefficients deviate')
         eps = torch.sum(self.cost_fun(coeffs[-1], t=self.t, y=self.data_raw))
-        self.assertTrue(eps.cpu() < 1, 'Error exceeded 1')
+        self.assertTrue(eps.cpu() < 1, 'Error exceeded')
         self.assertTrue(len(coeffs) < 40, 'Number of iterations exceeded 40')
 
     def test_all(self):
