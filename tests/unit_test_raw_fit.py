@@ -19,9 +19,7 @@ import torch
 from torch import nn
 import torch.nn.functional as F
 import torch.utils.data as Data
-import matplotlib.pyplot as plt
 from sklearn.model_selection import train_test_split
-import numpy as np
 from pathlib import Path
 
 from torchimize.optimizer.gna_opt import GNA
@@ -51,14 +49,15 @@ class TorchimizerTest(unittest.TestCase):
         self.plt_opt = False
 
     def setUp(self):
- 
-        np.random.seed(666)
-        X = np.linspace(-1, 1, 1000)
-        y = np.power(X, 2) + 0.1 * np.random.normal(0, 1, X.size)
+        
+        torch.manual_seed(3008)
+
+        X = torch.linspace(-1, 1, 1000)
+        y = X**2 + 0.1 * torch.normal(0, 1, size=(10,))
         print(X.shape)
         print(y.shape)
 
-        self.X_train, self.X_test, self.y_train, self.y_test = train_test_split(X, y, test_size=0.3, random_state=1024)
+        self.X_train, self.X_test, self.y_train, self.y_test = train_test_split(X.numpy(), y.numpy(), test_size=0.3, random_state=1024)
         self.X_train = torch.from_numpy(self.X_train).type(torch.FloatTensor)
         self.X_train = torch.unsqueeze(self.X_train, dim=1)
         self.y_train = torch.from_numpy(self.y_train).type(torch.FloatTensor)
@@ -106,6 +105,7 @@ class TorchimizerTest(unittest.TestCase):
         predict = predict.data.numpy()
         
         if self.plt_opt:
+            import matplotlib.pyplot as plt
             plt.scatter(self.X_test.numpy(), self.y_test, label='origin')
             plt.scatter(self.X_test.numpy(), predict, color='red', label='predict')
             plt.legend()
