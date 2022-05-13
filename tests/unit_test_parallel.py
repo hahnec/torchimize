@@ -31,21 +31,23 @@ class ParallelOptimizationTest(unittest.TestCase):
         torch.manual_seed(3008)
         self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
+        channel_num = 3
         # alpha, mu, sigma, eta
-        norm, mean, sigm, skew = 10, -1, 80, 5
-        self.initials = torch.tensor([7.5, -.75, 10, 3], dtype=torch.float64, device=self.device, requires_grad=True)
+        gt_params_list = [[10, -1, 80, 5], [5, -1.5, 60, 5], [8, 0, 90, 3]]
+        intials_list = [[7.5, -.75, 10, 3], [6, -1, 50, 4], [7, -1, 80, 4]]
+        self.gt_params = torch.tensor(gt_params_list, dtype=torch.float64, device=self.device)
+        self.initials = torch.tensor(intials_list, dtype=torch.float64, device=self.device, requires_grad=True)
+        
         self.cost_fun = lambda p_batch, t, y: (y-self.emg_model_batch(p_batch, t))**2
 
-        self.gt_params = torch.tensor([norm, mean, sigm, skew], dtype=torch.float64, device=self.device)
         self.t = torch.linspace(-1e3, 1e3, int(2e3)).to(self.device)
-        channel_num = 4
         self.data_channels = []
         self.initials_list = []
         for i in range(channel_num):
             torch.manual_seed(3008+i)
-            data = self.emg_model(self.gt_params, t=self.t)
+            data = self.emg_model(self.gt_params[i, ...], t=self.t)
             self.data_channels.append(data + .01 * torch.randn(len(data), dtype=torch.float64, device=self.device))
-            self.initials_list.append(self.initials)
+            self.initials_list.append(self.initials[i, ...])
         self.batch_data_channels = torch.stack(self.data_channels, dim=0)
         self.batch_initials = torch.stack(self.initials_list, dim=0)
 
@@ -115,7 +117,7 @@ class ParallelOptimizationTest(unittest.TestCase):
 
     def _test_lma_emg(self):
 
-        for m in ['lev', 'marq']:
+        for m in ['marq', 'lev']:
 
             coeffs = lsq_lma(self.batch_initials, self.cost_fun, jac_function=self.emg_jac_batch, args=(self.t, self.batch_data_channels), meth=m, max_iter=39)
 
@@ -129,7 +131,7 @@ class ParallelOptimizationTest(unittest.TestCase):
     def test_all(self):
 
         self.test_gna_emg()
-        #self.test_lma_emg()
+        #self._test_lma_emg()
 
 
 if __name__ == '__main__':
