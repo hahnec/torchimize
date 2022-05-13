@@ -78,7 +78,6 @@ def lsq_lma(
         D = torch.eye(j.shape[1], device=j.device)
         D *= 1 if meth == 'lev' else torch.max(torch.maximum(H.diagonal(), D.diagonal()))
         h = -torch.matmul(torch.linalg.inv(H+u*D), g)
-        f = fun(p)
         f_h = fun(p+h)
         rho_denom = torch.matmul(h, u*h-g)
         rho_nom = torch.matmul(f, f) - torch.matmul(f_h, f_h)
@@ -89,6 +88,8 @@ def lsq_lma(
             g = torch.matmul(j.T, fun(p))
             H = torch.matmul(j.T, j)
         p_list.append(p.detach())
+        f_prev = f.clone()
+        f = fun(p)
         if meth == 'lev':
             u, v = (u*torch.max(torch.tensor([1/3, 1-(2*rho-1)**3])), 2) if rho > 0 else (u*v, v*2)
         else:
@@ -97,7 +98,7 @@ def lsq_lma(
         # stop conditions
         gcon = max(abs(g)) < gtol
         pcon = (h**2).sum()**.5 < ptol*(ptol + (p**2).sum()**.5)
-        fcon = ((fun(p_list[-2])-fun(p_list[-1]))**2).sum() < ((ftol*f)**2).sum() if rho > 0 else False
+        fcon = ((f_prev-f)**2).sum() < ((ftol*f)**2).sum() if rho > 0 else False
         if gcon or pcon or fcon:
             break
 

@@ -66,6 +66,7 @@ def lsq_gna(
         h = -l*torch.matmul(torch.linalg.pinv(H), g)
         p = p + h
         p_list.append(p.detach())
+        f_prev = f.clone()
         f = fun(p)
         j = jac_fun(p)
         g = torch.matmul(j.T, f)
@@ -74,7 +75,7 @@ def lsq_gna(
         # stop conditions
         gcon = max(abs(g)) < gtol
         pcon = (h**2).sum()**.5 < ptol*(ptol + (p**2).sum()**.5)
-        fcon = ((fun(p_list[-2])-fun(p_list[-1]))**2).sum() < ((ftol*f)**2).sum()
+        fcon = ((f_prev-f)**2).sum() < ((ftol*f)**2).sum()
         if gcon or pcon or fcon:
             break
 
