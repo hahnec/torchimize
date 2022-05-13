@@ -17,11 +17,13 @@ __license__ = """
 from tests.unit_test_raw_fit import TorchimizerTest
 from tests.unit_test_skewed_gaussian import SkewedGaussianTest
 from tests.unit_test_analytical_jacobian import JacobianFunctionTest
+from tests.unit_test_parallel import ParallelOptimizationTest
 
 test_classes = [
     SkewedGaussianTest,
     TorchimizerTest,
     JacobianFunctionTest,
+    ParallelOptimizationTest,
                 ]
 
 for test_class in test_classes:
