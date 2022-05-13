@@ -28,13 +28,13 @@ def lsq_lma(
         ftol: float = 1e-8,
         ptol: float = 1e-8,
         gtol: float = 1e-8,
-        tau: float = 1e-3, 
+        tau: float = 1e-3,
         meth: str = 'lev',
-        rho1: float=.25, 
+        rho1: float = .25, 
         rho2: float = .75, 
-        bet: float = 2, 
-        gam: float = 3, 
-        max_iter: int = 100, 
+        bet: float = 2,
+        gam: float = 3,
+        max_iter: int = 100,
     ) -> List[torch.Tensor]:
     """
     Levenberg-Marquardt implementation for least-squares fitting of non-linear functions
