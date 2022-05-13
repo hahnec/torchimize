@@ -82,15 +82,16 @@ class JacobianFunctionTest(unittest.TestCase):
         self.assertTrue(len(coeffs) < 200, 'Number of iterations exceeded 200')
 
     def test_lma_emg(self):
+        
+        for m in ['lev', 'marq']:
+            coeffs = lsq_lma(self.initials, self.cost_fun, jac_function=self.emg_jac, args=(self.t, self.data_raw), meth=m, gtol=1e-6, max_iter=39)
 
-        coeffs = lsq_lma(self.initials, self.cost_fun, jac_function=self.emg_jac, args=(self.t, self.data_raw), meth='marq', gtol=1e-6, max_iter=39)
-
-        # assertion
-        ret_params = torch.allclose(coeffs[-1], self.gt_params, atol=1e-1)
-        self.assertTrue(ret_params, 'Coefficients deviate')
-        eps = torch.sum(self.cost_fun(coeffs[-1], t=self.t, y=self.data_raw))
-        self.assertTrue(eps.cpu() < 1, 'Error exceeded')
-        self.assertTrue(len(coeffs) < 40, 'Number of iterations exceeded 40')
+            # assertion
+            ret_params = torch.allclose(coeffs[-1], self.gt_params, atol=1e-1)
+            self.assertTrue(ret_params, 'Coefficients deviate')
+            eps = torch.sum(self.cost_fun(coeffs[-1], t=self.t, y=self.data_raw))
+            self.assertTrue(eps.cpu() < 1, 'Error exceeded')
+            self.assertTrue(len(coeffs) < 40, 'Number of iterations exceeded 40')
 
     def test_all(self):
 
