@@ -17,7 +17,7 @@ __license__ = """
 import unittest
 import torch
 
-from torchimize.functions.gna_fun_parallel import lsq_gna_parallel
+from torchimize.functions import lsq_gna_parallel
 from tests.emg_mm import *
 
 class ParallelOptimizationTest(unittest.TestCase):
