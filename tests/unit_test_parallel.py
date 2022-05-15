@@ -17,8 +17,8 @@ __license__ = """
 import unittest
 import torch
 
-from torchimize.functions.gna_fun_parallel import lsq_gna
-from torchimize.functions.lma_fun_parallel import lsq_lma
+from torchimize.functions.gna_fun_parallel import lsq_gna_parallel
+from torchimize.functions.lma_fun_parallel import lsq_lma_parallel
 from tests.emg_mm import *
 
 class ParallelOptimizationTest(unittest.TestCase):
@@ -106,7 +106,7 @@ class ParallelOptimizationTest(unittest.TestCase):
 
     def test_gna_emg(self):
 
-        coeffs = lsq_gna(self.batch_initials, self.cost_fun, jac_function=self.emg_jac_batch, args=(self.t, self.batch_data_channels), l=.1, gtol=1e-6, max_iter=199)
+        coeffs = lsq_gna_parallel(self.batch_initials, self.cost_fun, jac_function=self.emg_jac_batch, args=(self.t, self.batch_data_channels), l=.1, gtol=1e-6, max_iter=199)
 
         # assertion
         ret_params = torch.allclose(coeffs[-1], self.gt_params, atol=1e-1)
@@ -119,7 +119,7 @@ class ParallelOptimizationTest(unittest.TestCase):
 
         for m in ['lev', 'marq']:
 
-            coeffs = lsq_lma(self.batch_initials, self.cost_fun, jac_function=self.emg_jac_batch, args=(self.t, self.batch_data_channels), meth=m, ptol=1e-11, max_iter=199)
+            coeffs = lsq_lma_parallel(self.batch_initials, self.cost_fun, jac_function=self.emg_jac_batch, args=(self.t, self.batch_data_channels), meth=m, ptol=1e-11, max_iter=199)
 
             # assertion
             ret_params = torch.allclose(torch.round(coeffs[-1]), self.gt_params, atol=1e-1)

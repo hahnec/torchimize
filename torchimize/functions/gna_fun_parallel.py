@@ -3,7 +3,7 @@ from typing import Union, Callable, Tuple, List
 
 from torchimize.functions.jacobian import jacobian_approx_t
 
-def lsq_gna(
+def lsq_gna_parallel(
         p: torch.Tensor,
         function: Callable, 
         jac_function: Callable = None,
