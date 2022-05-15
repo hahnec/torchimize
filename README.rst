@@ -11,6 +11,11 @@ Description
 
 |coverage| |tests_develop| |tests_master| |pypi| |license|
 
+Installation
+============
+
+``$ python3 -m pip install torchimize``
+
 Functional API Usage
 ====================
 
@@ -18,12 +23,15 @@ Functional API Usage
 
     # gauss-newton
     from torchimize.functions import lsq_gna
-    coeffs_gna, eps_gna = lsq_gna(initials, cost_fun, args=(other_inputs,), tol=1e-6)
+    coeffs_list = lsq_gna(initials, cost_fun, args=(other_args,))
 
     # levenberg-marquardt
     from torchimize.functions import lsq_lma
-    coeffs_lma, eps_lma = lsq_lma(initials, cost_fun, args=(other_inputs,), tol=1e-6)
-    
+    coeffs_list = lsq_lma(initials, function=cost_fun, jac_function=jac_fun, args=(other_args,))
+
+    # parallel gauss-newton using batches
+    from torchimize.functions import lsq_gna_parallel
+    coeffs_list = lsq_gna_parallel(initials_batch, function=cost_fun_batch, jac_function=jac_fun_batch, args=(other_args,))
 
 .. substitutions
 
