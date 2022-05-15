@@ -33,6 +33,7 @@ Functional API Usage
     from torchimize.functions import lsq_gna_parallel
     coeffs_list = lsq_gna_parallel(initials_batch, function=cost_fun_batch, jac_function=jac_fun_batch, args=(other_args,))
 
+
 .. substitutions
 
 .. |coverage| image:: https://coveralls.io/repos/github/hahnec/torchimize/badge.svg?branch=master
