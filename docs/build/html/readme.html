@@ -1,0 +1,136 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>1. torchimize &#8212; torchimize 0.0.2 documentation</title>
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="_static/sphinxdoc.css" />
+    <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+    <script src="_static/jquery.js"></script>
+    <script src="_static/underscore.js"></script>
+    <script src="_static/doctools.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="2. API documentation" href="apidoc.html" />
+    <link rel="prev" title="Torchimize’s documentation" href="index.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="apidoc.html" title="2. API documentation"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="index.html" title="Torchimize’s documentation"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">torchimize 0.0.2 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href=""><span class="section-number">1. </span>torchimize</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="torchimize">
+<h1><span class="section-number">1. </span>torchimize<a class="headerlink" href="#torchimize" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="description">
+<h2><span class="section-number">1.1. </span>Description<a class="headerlink" href="#description" title="Permalink to this headline">¶</a></h2>
+<p><em>torchimize</em> contains implementations of the Gauss-Newton and Levenberg-Marquardt optimization algorithms using the PyTorch library. The main motivation for this project is to enable convex optimization on GPUs based on the torch.Tensor class, which (as of 2022) is widely used in the deep learning field. This package features the capability to minimize several least-squares optimization problems at each loop iteration simultaneously.</p>
+<p><a class="reference external" href="https://coveralls.io/github/hahnec/torchimize"><img alt="coverage" src="https://coveralls.io/repos/github/hahnec/torchimize/badge.svg?branch=master" /></a> <a class="reference external" href="https://github.com/hahnec/torchimize/actions/"><img alt="tests_develop" src="https://img.shields.io/github/workflow/status/hahnec/torchimize/torchimize%20unit%20tests/develop?label=tests%20on%20develop" /></a> <a class="reference external" href="https://github.com/hahnec/torchimize/actions/"><img alt="tests_master" src="https://img.shields.io/github/workflow/status/hahnec/torchimize/torchimize%20unit%20tests/master?label=tests%20on%20master" /></a> <a class="reference external" href="https://pypi.org/project/torchimize/"><img alt="PyPI Downloads" src="https://img.shields.io/pypi/dm/torchimize?label=PyPI%20downloads" /></a> <a class="reference external" href="https://www.gnu.org/licenses/gpl-3.0.en.html"><img alt="License" src="https://img.shields.io/badge/License-GPL%20v3.0-orange.svg" /></a></p>
+</div>
+<div class="section" id="installation">
+<h2><span class="section-number">1.2. </span>Installation<a class="headerlink" href="#installation" title="Permalink to this headline">¶</a></h2>
+<p><code class="docutils literal notranslate"><span class="pre">$</span> <span class="pre">python3</span> <span class="pre">-m</span> <span class="pre">pip</span> <span class="pre">install</span> <span class="pre">torchimize</span></code></p>
+</div>
+<div class="section" id="functional-api-usage">
+<h2><span class="section-number">1.3. </span>Functional API Usage<a class="headerlink" href="#functional-api-usage" title="Permalink to this headline">¶</a></h2>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># gauss-newton</span>
+<span class="kn">from</span> <span class="nn">torchimize.functions</span> <span class="kn">import</span> <span class="n">lsq_gna</span>
+<span class="n">coeffs_list</span> <span class="o">=</span> <span class="n">lsq_gna</span><span class="p">(</span><span class="n">initials</span><span class="p">,</span> <span class="n">cost_fun</span><span class="p">,</span> <span class="n">args</span><span class="o">=</span><span class="p">(</span><span class="n">other_args</span><span class="p">,))</span>
+
+<span class="c1"># levenberg-marquardt</span>
+<span class="kn">from</span> <span class="nn">torchimize.functions</span> <span class="kn">import</span> <span class="n">lsq_lma</span>
+<span class="n">coeffs_list</span> <span class="o">=</span> <span class="n">lsq_lma</span><span class="p">(</span><span class="n">initials</span><span class="p">,</span> <span class="n">function</span><span class="o">=</span><span class="n">cost_fun</span><span class="p">,</span> <span class="n">jac_function</span><span class="o">=</span><span class="n">jac_fun</span><span class="p">,</span> <span class="n">args</span><span class="o">=</span><span class="p">(</span><span class="n">other_args</span><span class="p">,))</span>
+
+<span class="c1"># parallel gauss-newton using batches</span>
+<span class="kn">from</span> <span class="nn">torchimize.functions</span> <span class="kn">import</span> <span class="n">lsq_gna_parallel</span>
+<span class="n">coeffs_list</span> <span class="o">=</span> <span class="n">lsq_gna_parallel</span><span class="p">(</span><span class="n">initials_batch</span><span class="p">,</span> <span class="n">function</span><span class="o">=</span><span class="n">cost_fun_batch</span><span class="p">,</span> <span class="n">jac_function</span><span class="o">=</span><span class="n">jac_fun_batch</span><span class="p">,</span> <span class="n">args</span><span class="o">=</span><span class="p">(</span><span class="n">other_args</span><span class="p">,))</span>
+</pre></div>
+</div>
+</div>
+</div>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">1. torchimize</a><ul>
+<li><a class="reference internal" href="#description">1.1. Description</a></li>
+<li><a class="reference internal" href="#installation">1.2. Installation</a></li>
+<li><a class="reference internal" href="#functional-api-usage">1.3. Functional API Usage</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="index.html"
+                        title="previous chapter">Torchimize’s documentation</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="apidoc.html"
+                        title="next chapter"><span class="section-number">2. </span>API documentation</a></p>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/readme.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="apidoc.html" title="2. API documentation"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="index.html" title="Torchimize’s documentation"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">torchimize 0.0.2 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href=""><span class="section-number">1. </span>torchimize</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2022, Christopher Hahne &amp; Michel Hayoz.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 4.3.2.
+    </div>
+  </body>
+</html>
