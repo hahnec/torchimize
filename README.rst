@@ -33,6 +33,8 @@ Functional API Usage
     from torchimize.functions import lsq_gna_parallel
     coeffs_list = lsq_gna_parallel(initials_batch, function=cost_fun_batch, jac_function=jac_fun_batch, args=(other_args,))
 
+For further details, see the |apidoc|_.
+
 
 .. substitutions
 
@@ -52,3 +54,6 @@ Functional API Usage
 .. |pypi| image:: https://img.shields.io/pypi/dm/torchimize?label=PyPI%20downloads
     :target: https://pypi.org/project/torchimize/
     :alt: PyPI Downloads
+
+.. |apidoc| replace:: **API documentation**
+    :target: https://hahnec.github.io/torchimize/
