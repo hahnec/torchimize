@@ -18,7 +18,6 @@ import unittest
 import torch
 
 from torchimize.functions.gna_fun_parallel import lsq_gna_parallel
-from torchimize.functions.lma_fun_parallel import lsq_lma_parallel
 from tests.emg_mm import *
 
 class ParallelOptimizationTest(unittest.TestCase):
@@ -116,6 +115,8 @@ class ParallelOptimizationTest(unittest.TestCase):
         self.assertTrue(len(coeffs) < 200, 'Number of iterations exceeded 200')
 
     def _test_lma_emg(self):
+
+        from torchimize.functions.lma_fun_parallel import lsq_lma_parallel
 
         for m in ['lev', 'marq']:
 
