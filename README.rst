@@ -56,4 +56,4 @@ For further details, see the |apidoc|_.
     :alt: PyPI Downloads
 
 .. |apidoc| replace:: **API documentation**
-.. _apidoc: hahnec.github.io/torchimize/
+.. _apidoc: https://hahnec.github.io/torchimize/build/html/index.html
