@@ -45,7 +45,7 @@ Functional API Usage
                     )
 
 .. note::
-    For simultaneous minimization of `B` optimization problems at a multiple of `C` costs, the `function` and `jac_function` arguments require to return a torch.Tensor type of `B x C x N` and `B x C x N x P`, respectively. Here, `N` is the residual dimension and `P` represents the sought parameter number in each `B x C`.
+    For simultaneous minimization of ``B`` optimization problems at a multiple of ``C`` costs, the ``function`` and ``jac_function`` arguments require to return a torch.Tensor type of ``B x C x N`` and ``B x C x N x P``, respectively. Here, ``N`` is the residual dimension and ``P`` represents the sought parameter number in each ``B x C``.
 
 For further details, see the |apidoc|_.
 

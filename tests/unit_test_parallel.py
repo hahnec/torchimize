@@ -119,7 +119,15 @@ class ParallelOptimizationTest(unittest.TestCase):
 
     def test_gna_emg_analytical(self):
 
-        coeffs = lsq_gna_parallel(self.batch_initials, self.multi_cost_batch, jac_function=self.multi_jac_batch, args=(self.t, self.batch_data_channels), l=.1, gtol=1e-6, max_iter=199)
+        coeffs = lsq_gna_parallel(
+            p = self.batch_initials,
+            function = self.multi_cost_batch,
+            jac_function = self.multi_jac_batch,
+            args = (self.t, self.batch_data_channels),
+            l = .1,
+            gtol = 1e-6,
+            max_iter = 199,
+        )
 
         # assertion
         ret_params = torch.allclose(coeffs[-1], self.gt_params, atol=1e-1)
