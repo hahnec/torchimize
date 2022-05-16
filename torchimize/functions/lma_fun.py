@@ -38,6 +38,7 @@ def lsq_lma(
     ) -> List[torch.Tensor]:
     """
     Levenberg-Marquardt implementation for least-squares fitting of non-linear functions
+    
     :param p: initial value(s)
     :param function: user-provided function which takes p (and additional arguments) as input
     :param jac_fun: user-provided Jacobian function which takes p (and additional arguments) as input
@@ -52,7 +53,7 @@ def lsq_lma(
     :param bet: multiplier for damping parameter adjustment for Marquardt
     :param gam: divisor for damping parameter adjustment for Marquardt
     :param max_iter: maximum number of iterations
-    :return: list of results, eps
+    :return: list of results
     """
 
     if len(args) > 0:

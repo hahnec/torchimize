@@ -16,7 +16,8 @@ def lsq_gna_parallel(
         max_iter: int = 100,
     ) -> List[torch.Tensor]:
     """
-    Gauss-Newton implementation for least-squares fitting of non-linear functions
+    Gauss-Newton implementation for parallel least-squares fitting of non-linear functions
+
     :param p: initial value(s)
     :param function: user-provided function which takes p (and additional arguments) as input
     :param jac_fun: user-provided Jacobian function which takes p (and additional arguments) as input
@@ -27,7 +28,7 @@ def lsq_gna_parallel(
     :param gtol: maximum gradient tolerance as stop condition
     :param l: learning rate
     :param max_iter: maximum number of iterations
-    :return: list of results, eps
+    :return: list of results
     """
 
     if len(args) > 0:
