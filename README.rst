@@ -32,10 +32,16 @@ Functional API Usage
     # parallel gauss-newton for batch-optimization at multiple costs
     from torchimize.functions import lsq_gna_parallel
     coeffs_list = lsq_gna_parallel(
-                        initials_batch,
-                        function=multi_cost_fun_batch,
-                        jac_function=multi_jac_fun_batch,
-                        args=(other_args,),
+                        p = initials_batch,
+                        function = multi_cost_fun_batch,
+                        jac_function = multi_jac_fun_batch,
+                        args = (other_args,),
+                        wvec = torch.ones(5, device='cuda', dtype=torch.float64),
+                        ftol = 1e-8,
+                        ptol = 1e-8,
+                        gtol = 1e-8,
+                        l = .1,
+                        max_iter = 40,
                     )
 
 .. note::
