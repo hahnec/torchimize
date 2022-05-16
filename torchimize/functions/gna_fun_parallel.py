@@ -1,3 +1,4 @@
+from curses.ascii import GS
 import torch
 from typing import Union, Callable, Tuple, List
 
@@ -8,6 +9,7 @@ def lsq_gna_parallel(
         function: Callable, 
         jac_function: Callable = None,
         args: Union[Tuple, List] = (),
+        wvec: torch.Tensor = None,
         ftol: float = 1e-8,
         ptol: float = 1e-8,
         gtol: float = 1e-8,
@@ -41,19 +43,34 @@ def lsq_gna_parallel(
         jac_fun = lambda p: jac_function(p, *args)
 
     f = fun(p)
+    assert len(f.shape) == 3, 'residual tensor is supposed to have 3 dims'
+
     j = jac_fun(p)
-    g = torch.bmm(j.transpose(-2, -1), f[..., None])[..., 0]
-    H = torch.bmm(j.transpose(-2, -1), j)
-    p_list = [p]
+    assert len(j.shape) == 4, 'jacobian tensor is supposed to have 4 dims'
+
+    # use weights of ones as default
+    wvec = torch.ones(f.shape[1], dtype=p.dtype, device=p.device) if wvec is None else wvec
+
+    # compute gradient and Hessian costs
+    gc = torch.einsum('bcnp,bcnp->bcp', j, f[..., None])
+    Hc = torch.einsum('bcnp,bcni->bcpi', j, j)
+
+    # reduce multiple costs dimension through weighting
+    g = torch.einsum('bcp,c->bp', gc, wvec)
+    H = torch.einsum('bcpi,c->bpi', Hc, wvec)
+    
+    p_list = []
     while len(p_list) < max_iter:
-        h = -l*torch.linalg.lstsq(H, g, rcond=None, driver=None)[0]#-l*torch.bmm(torch.pinverse(H), g)[..., 0]#
+        h = -l*torch.linalg.lstsq(H, g, rcond=None, driver=None)[0]
         p = p + h
         p_list.append(p.detach())
         f_prev = f.clone()
         f = fun(p)
         j = jac_fun(p)
-        g = torch.bmm(j.transpose(-2, -1), f[..., None])[..., 0]
-        H = torch.bmm(j.transpose(-2, -1), j)
+        gc = torch.einsum('bcnp,bcnp->bcp', j, f[..., None])
+        Hc = torch.einsum('bcnp,bcni->bcpi', j, j)
+        g = torch.einsum('bcp,c->bp', gc, wvec)
+        H = torch.einsum('bcpi,c->bpi', Hc, wvec)
 
         # stop conditions
         gcon = torch.max(abs(g)) < gtol
