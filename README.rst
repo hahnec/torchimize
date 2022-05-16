@@ -57,3 +57,17 @@ For further details, see the |apidoc|_.
 
 .. |apidoc| replace:: **API documentation**
 .. _apidoc: https://hahnec.github.io/torchimize/build/html/index.html
+
+Citation
+--------
+
+.. code-block:: BibTeX
+
+    @misc{torchimize,
+        title={Torchimize},
+        author={Hahne, Christopher and Hayoz, Michel},
+        year={2022},
+        publisher = {GitHub},
+        journal = {GitHub repository},
+        howpublished = {\url{https://github.com/hahnec/torchimize}}
+    }
