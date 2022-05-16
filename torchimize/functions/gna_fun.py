@@ -63,7 +63,7 @@ def lsq_gna(
     H = torch.matmul(j.T, j)
     p_list = [p]
     while len(p_list) < max_iter:
-        h = -l*torch.matmul(torch.linalg.pinv(H), g)
+        h = -l*torch.linalg.lstsq(H, g, rcond=None, driver=None)[0]
         p = p + h
         p_list.append(p.detach())
         f_prev = f.clone()

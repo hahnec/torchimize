@@ -20,7 +20,7 @@ from typing import Union, Callable, List, Tuple
 from torchimize.functions.jacobian import jacobian_approx_t
 
 
-def lsq_lma(
+def lsq_lma_parallel(
         p: torch.Tensor,
         function: Callable, 
         jac_function: Callable = None, 
@@ -28,13 +28,13 @@ def lsq_lma(
         ftol: float = 1e-8,
         ptol: float = 1e-8,
         gtol: float = 1e-8,
-        tau: float = 1e-3,
+        tau: float = 1e-3, 
         meth: str = 'lev',
         rho1: float = .25, 
         rho2: float = .75, 
-        bet: float = 2,
-        gam: float = 3,
-        max_iter: int = 100,
+        bet: float = 2, 
+        gam: float = 3, 
+        max_iter: int = 100, 
     ) -> List[torch.Tensor]:
     """
     Levenberg-Marquardt implementation for least-squares fitting of non-linear functions
@@ -69,37 +69,48 @@ def lsq_lma(
 
     f = fun(p)
     j = jac_fun(p)
-    g = torch.matmul(j.T, f)
-    H = torch.matmul(j.T, j)
-    u = tau * torch.max(torch.diag(H))
-    v = 2
-    p_list = [p]
+    g = torch.bmm(j.transpose(-2, -1), f[..., None])[..., 0]
+    H = torch.bmm(j.transpose(-2, -1), j)
+    D = torch.eye(j.shape[-1], dtype=p.dtype, device=j.device)[None, ...].repeat(j.shape[0], 1, 1)
+    u = tau * torch.max(torch.diagonal(H, dim1=-2, dim2=-1), 1)[0]
+    sinf = torch.tensor([-torch.inf, torch.inf], dtype=p.dtype, device=p.device)
+    ones = torch.ones(p.shape[0], dtype=p.dtype, device=p.device)
+    v = 2*ones
+    f_prev = f.clone()
+    p_list = [p.clone().detach()]
     while len(p_list) < max_iter:
-        D = torch.eye(j.shape[1], device=j.device)
-        D *= 1 if meth == 'lev' else torch.max(torch.maximum(H.diagonal(), D.diagonal()))
-        h = -torch.linalg.lstsq(H+u*D, g, rcond=None, driver=None)[0]
+        D *= torch.ones_like(H) if meth == 'lev' else torch.max(torch.maximum(H.diagonal(dim1=2), D.diagonal(dim1=2)), dim=1)[0][..., None, None]
+
+        h = -torch.linalg.lstsq(H+u[:, None, None]*D, g, rcond=None, driver=None)[0]
         f_h = fun(p+h)
-        rho_denom = torch.matmul(h, u*h-g)
-        rho_nom = torch.matmul(f, f) - torch.matmul(f_h, f_h)
-        rho = rho_nom / rho_denom if rho_denom > 0 else torch.inf if rho_nom > 0 else -torch.inf
-        if rho > 0:
-            p = p + h
-            j = jac_fun(p)
-            g = torch.matmul(j.T, fun(p))
-            H = torch.matmul(j.T, j)
-        p_list.append(p.detach())
+        rho_denom = torch.bmm(h[:, None, :], (u[:, None]*h-g)[:, :, None])[:, 0, 0]
+        rho_nom = torch.bmm(f[:, None, :], f[..., None]).flatten() - torch.bmm(f_h[:, None, :], f_h[..., None]).flatten()
+        rho = torch.zeros(p.shape[0], dtype=p.dtype, device=p.device)
+        rho[rho_denom>0] = (rho_nom / rho_denom)[rho_denom>0]
+        rho[rho_denom<0] = sinf[(rho_nom > 0).type(torch.int64)][rho_denom<0]
+        p[rho>0, ...] = p[rho>0, ...] + h[rho>0, ...]
+        j[rho>0, ...] = jac_fun(p)[rho>0, ...]
+        g[rho>0, ...] = torch.bmm(j.transpose(-2, -1), f[..., None])[rho>0, :, 0]
+        H[rho>0, ...] = torch.bmm(j.transpose(-2, -1), j)[rho>0, ...]
+        p_list.append(p.clone().detach())
         f_prev = f.clone()
         f = fun(p)
         if meth == 'lev':
-            u, v = (u*torch.max(torch.tensor([1/3, 1-(2*rho-1)**3])), 2) if rho > 0 else (u*v, v*2)
+            u[rho>0] *= torch.maximum(ones/3, 1-(2*rho-1)**3)[rho>0]
+            u[rho<0] *= v[rho<0]
+            v[rho>0] = 2*ones[rho>0]
+            v[rho<0] *= 2
         else:
-            u = u*bet if rho < rho1 else u/gam if rho > rho2 else u
+            u[rho < rho1] *= bet
+            u[rho > rho2] /= gam
 
         # stop conditions
-        gcon = max(abs(g)) < gtol
+        gcon = torch.max(abs(g)) < gtol
         pcon = (h**2).sum()**.5 < ptol*(ptol + (p**2).sum()**.5)
-        fcon = ((f_prev-f)**2).sum() < ((ftol*f)**2).sum() if rho > 0 else False
+        fcon = ((f_prev-f)**2).sum() < ((ftol*f)**2).sum() if (rho > 0).sum() > 0 else False
         if gcon or pcon or fcon:
             break
+    
+    [print(p[0].cpu().detach()) for p in p_list]
 
     return p_list
