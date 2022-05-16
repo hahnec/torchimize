@@ -54,20 +54,25 @@ For further details, see the |apidoc|_.
 
 .. |coverage| image:: https://coveralls.io/repos/github/hahnec/torchimize/badge.svg?branch=master
     :target: https://coveralls.io/github/hahnec/torchimize
+    :width: 100
 
 .. |tests_develop| image:: https://img.shields.io/github/workflow/status/hahnec/torchimize/torchimize%20unit%20tests/develop?label=tests%20on%20develop
     :target: https://github.com/hahnec/torchimize/actions/
+    :width: 150
 
 .. |tests_master| image:: https://img.shields.io/github/workflow/status/hahnec/torchimize/torchimize%20unit%20tests/master?label=tests%20on%20master
     :target: https://github.com/hahnec/torchimize/actions/
+    :width: 150
 
-.. |license| image:: https://img.shields.io/badge/License-GPL%20v3.0-orange.svg
+.. |license| image:: https://img.shields.io/badge/License-GPL%20v3.0-orange.svg?logoWidth=40
     :target: https://www.gnu.org/licenses/gpl-3.0.en.html
     :alt: License
+    :width: 150
 
 .. |pypi| image:: https://img.shields.io/pypi/dm/torchimize?label=PyPI%20downloads
     :target: https://pypi.org/project/torchimize/
     :alt: PyPI Downloads
+    :width: 150
 
 .. |apidoc| replace:: **API documentation**
 .. _apidoc: https://hahnec.github.io/torchimize/build/html/index.html
