@@ -7,7 +7,7 @@ torchimize
 Description
 ===========
 
-*torchimize* contains implementations of the Gauss-Newton and Levenberg-Marquardt optimization algorithms using the PyTorch library. The main motivation for this project is to enable convex optimization on GPUs based on the torch.Tensor class, which (as of 2022) is widely used in the deep learning field. This package features the capability to minimize several least-squares optimization problems at each loop iteration simultaneously.
+*torchimize* contains implementations of the Gauss-Newton and Levenberg-Marquardt optimization algorithms using the PyTorch library. The main motivation for this project is to enable convex optimization on GPUs based on the torch.Tensor class, which (as of 2022) is widely used in the deep learning field. This package features the capability to minimize several least-squares optimization problems at each loop iteration in parallel.
 
 |coverage| |tests_develop| |tests_master| |pypi| |license|
 
@@ -21,17 +21,25 @@ Functional API Usage
 
 .. code-block:: python
 
-    # gauss-newton
+    # single gauss-newton
     from torchimize.functions import lsq_gna
     coeffs_list = lsq_gna(initials, cost_fun, args=(other_args,))
 
-    # levenberg-marquardt
+    # single levenberg-marquardt
     from torchimize.functions import lsq_lma
     coeffs_list = lsq_lma(initials, function=cost_fun, jac_function=jac_fun, args=(other_args,))
 
-    # parallel gauss-newton using batches
+    # parallel gauss-newton for batch-optimization at multiple costs
     from torchimize.functions import lsq_gna_parallel
-    coeffs_list = lsq_gna_parallel(initials_batch, function=cost_fun_batch, jac_function=jac_fun_batch, args=(other_args,))
+    coeffs_list = lsq_gna_parallel(
+                        initials_batch,
+                        function=multi_cost_fun_batch,
+                        jac_function=multi_jac_fun_batch,
+                        args=(other_args,),
+                    )
+
+.. note::
+    For simultaneous minimization of `B` optimization problems at a multiple of `C` costs, the `function` and `jac_function` arguments require to return a torch.Tensor type of `B x C x N` and `B x C x N x P`, respectively. Here, `N` is the residual dimension and `P` represents the sought parameter number in each `B x C`.
 
 For further details, see the |apidoc|_.
 
@@ -59,7 +67,7 @@ For further details, see the |apidoc|_.
 .. _apidoc: https://hahnec.github.io/torchimize/build/html/index.html
 
 Citation
---------
+========
 
 .. code-block:: BibTeX
 

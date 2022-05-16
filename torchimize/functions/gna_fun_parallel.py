@@ -22,6 +22,7 @@ def lsq_gna_parallel(
     :param function: user-provided function which takes p (and additional arguments) as input
     :param jac_fun: user-provided Jacobian function which takes p (and additional arguments) as input
     :param args: optional arguments passed to function
+    :param wvec: weights vector used in reduction of multiple costs
     :param ftol: relative change in cost function as stop condition
     :param ptol: relative change in independant variables as stop condition
     :param gtol: maximum gradient tolerance as stop condition
@@ -58,7 +59,7 @@ def lsq_gna_parallel(
     # reduce multiple costs dimension through weighting
     g = torch.einsum('bcp,c->bp', gc, wvec)
     H = torch.einsum('bcpi,c->bpi', Hc, wvec)
-    
+
     p_list = []
     while len(p_list) < max_iter:
         h = -l*torch.linalg.lstsq(H, g, rcond=None, driver=None)[0]
