@@ -30,16 +30,16 @@ class ParallelOptimizationTest(unittest.TestCase):
         torch.manual_seed(3008)
         self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
-        channel_num = 3
         # alpha, mu, sigma, eta
-        gt_params_list = [[10, -1, 80, 5], [5, -2, 60, 5], [8, 0, 90, 3]]
-        intials_list = [[7.5, -.75, 10, 3], [6, -1, 50, 4], [7, -1, 80, 4]]
+        gt_params_list = [[10, -1, 80, 5], [5, -2, 60, 5], [8, 0, 90, 3], [10, -1, 80, 5], [5, -2, 60, 5], [8, 0, 90, 3]]
+        initials_list = [[7.5, -.75, 10, 3], [6, -1, 50, 4], [7, -1, 80, 4], [7.5, -.75, 10, 3], [6, -1, 50, 4], [7, -1, 80, 4]]
+        channel_num = len(gt_params_list)
         self.gt_params = torch.tensor(gt_params_list, dtype=torch.float64, device=self.device)
-        self.initials = torch.tensor(intials_list, dtype=torch.float64, device=self.device, requires_grad=True)
+        self.initials = torch.tensor(initials_list, dtype=torch.float64, device=self.device, requires_grad=True)
         
         self.cost_fun = lambda p_batch, t, y: (y-self.emg_model_batch(p_batch, t))**2
 
-        self.t = torch.linspace(-1e3, 1e3, int(2e3)).to(self.device)
+        self.t = torch.linspace(-1e3, 1e3, int(2e3), device=self.device)
         self.data_channels = []
         self.initials_list = []
         for i in range(channel_num):
@@ -111,7 +111,7 @@ class ParallelOptimizationTest(unittest.TestCase):
         ret_params = torch.allclose(coeffs[-1], self.gt_params, atol=1e-1)
         self.assertTrue(ret_params, 'Coefficients deviate')
         eps = torch.sum(self.cost_fun(coeffs[-1], t=self.t, y=self.batch_data_channels))
-        self.assertTrue(eps.cpu() < 1, 'Error exceeded 1')
+        self.assertTrue(eps.cpu()/len(self.gt_params) < 1, 'Error exceeded 1')
         self.assertTrue(len(coeffs) < 200, 'Number of iterations exceeded 200')
 
     def _test_lma_emg(self):
@@ -126,7 +126,7 @@ class ParallelOptimizationTest(unittest.TestCase):
             ret_params = torch.allclose(torch.round(coeffs[-1]), self.gt_params, atol=1e-1)
             self.assertTrue(ret_params, 'Coefficients deviate')
             eps = torch.sum(self.cost_fun(coeffs[-1], t=self.t, y=self.batch_data_channels))
-            self.assertTrue(eps.cpu() < 1, 'Error exceeded 1')
+            self.assertTrue(eps.cpu()/len(self.gt_params) < 1, 'Error exceeded 1')
             self.assertTrue(len(coeffs) < 40, 'Number of iterations exceeded 40')
 
     def test_all(self):
