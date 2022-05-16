@@ -1,4 +1,3 @@
-from curses.ascii import GS
 import torch
 from typing import Union, Callable, Tuple, List
 
@@ -51,6 +50,7 @@ def lsq_gna_parallel(
 
     # use weights of ones as default
     wvec = torch.ones(f.shape[1], dtype=p.dtype, device=p.device) if wvec is None else wvec
+    assert len(wvec) == f.shape[1], 'weights vector length is supposed to match number of costs'
 
     # compute gradient and Hessian costs
     gc = torch.einsum('bcnp,bcnp->bcp', j, f[..., None])
