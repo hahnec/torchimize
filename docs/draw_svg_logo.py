@@ -21,10 +21,10 @@ tlayer3 = draw.Text(lettering, 50, x=0, y=30, center=0.0, fill='#cccccc', font="
 tlayer4 = draw.Text(lettering, 50, x=0, y=40, center=0.0, fill='#ee4c2c', font="FreightSansLFPro")
 
 duration = '3s'
-tlayer1.appendAnim(draw.Animate('y', duration, '-6;-16;-6', repeatCount='indefinite'))
-tlayer2.appendAnim(draw.Animate('y', duration, '-13;-18;-13', repeatCount='indefinite'))
-tlayer3.appendAnim(draw.Animate('y', duration, '-25;-20;-25', repeatCount='indefinite'))
-tlayer4.appendAnim(draw.Animate('y', duration, '-32;-22;-32', repeatCount='indefinite'))
+tlayer1.appendAnim(draw.Animate('y', duration, '-6;-16;-16;-6;', repeatCount='indefinite'))
+tlayer2.appendAnim(draw.Animate('y', duration, '-13;-18;-18;-13;', repeatCount='indefinite'))
+tlayer3.appendAnim(draw.Animate('y', duration, '-25;-20;-20;-25;', repeatCount='indefinite'))
+tlayer4.appendAnim(draw.Animate('y', duration, '-32;-22;-22;-32', repeatCount='indefinite'))
 
 # create hyperlink
 hlink = Hyperlink('https://hahnec.github.io/torchimize/build/html/index.html', target='_blank', transform='skewY(0)')
