@@ -87,7 +87,7 @@ Citation
 .. code-block:: BibTeX
 
     @misc{torchimize,
-        title={Torchimize},
+        title={torchimize},
         author={Hahne, Christopher and Hayoz, Michel},
         year={2022},
         publisher = {GitHub},
