@@ -50,7 +50,7 @@ For further details, see the |apidoc|_.
 
 .. substitutions
 
-.. |logo| image:: http://wp12283669.server-he.de/Xchange/torchimize_logo.svg
+.. |logo| image:: https://github.com/hahnec/torchimize/blob/develop/docs/torchimize_logo.svg
     :target: https://hahnec.github.io/torchimize/
     :width: 400 px
     :scale: 100 %
@@ -76,7 +76,7 @@ For further details, see the |apidoc|_.
 .. |pypi| image:: https://img.shields.io/pypi/dm/torchimize?label=PyPI%20downloads
     :target: https://pypi.org/project/torchimize/
     :alt: PyPI Downloads
-    :width: 160
+    :width: 162
 
 .. |apidoc| replace:: **API documentation**
 .. _apidoc: https://hahnec.github.io/torchimize/build/html/apidoc.html
