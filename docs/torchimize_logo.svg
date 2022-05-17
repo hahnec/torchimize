@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"
-     width="270" height="80" viewBox="0 -80 270 80">
+     width="240" height="80" viewBox="0 -80 240 80">
 <defs>
 </defs>
 <a href="https://hahnec.github.io/torchimize/build/html/index.html" target="_blank" transform="skewY(0)">
-<text x="0" y="-10" font-size="50" fill="#444444" font="FreightSansLFPro" dy="0em">torchimize<animate repeatCount="indefinite" attributeName="y" dur="3s" values="-6;-16;-16;-6;" /></text>
-<text x="0" y="-20" font-size="50" fill="#888888" font="FreightSansLFPro" dy="0em">torchimize<animate repeatCount="indefinite" attributeName="y" dur="3s" values="-13;-18;-18;-13;" /></text>
-<text x="0" y="-30" font-size="50" fill="#cccccc" font="FreightSansLFPro" dy="0em">torchimize<animate repeatCount="indefinite" attributeName="y" dur="3s" values="-25;-20;-20;-25;" /></text>
-<text x="0" y="-40" font-size="50" fill="#ee4c2c" font="FreightSansLFPro" dy="0em">torchimize<animate repeatCount="indefinite" attributeName="y" dur="3s" values="-32;-22;-22;-32" /></text>
+<text x="0" y="-10" font-size="50" fill="#444444" font-family="FreightSansLFPro" dy="0em">torchimize<animate repeatCount="indefinite" attributeName="y" dur="3s" values="-6;-16;-16;-6;" /></text>
+<text x="0" y="-20" font-size="50" fill="#888888" font-family="FreightSansLFPro" dy="0em">torchimize<animate repeatCount="indefinite" attributeName="y" dur="3s" values="-13;-18;-18;-13;" /></text>
+<text x="0" y="-30" font-size="50" fill="#cccccc" font-family="FreightSansLFPro" dy="0em">torchimize<animate repeatCount="indefinite" attributeName="y" dur="3s" values="-25;-20;-20;-25;" /></text>
+<text x="0" y="-40" font-size="50" fill="#ee4c2c" font-family="FreightSansLFPro" dy="0em">torchimize<animate repeatCount="indefinite" attributeName="y" dur="3s" values="-32;-22;-22;-32" /></text>
 </a>
 </svg>

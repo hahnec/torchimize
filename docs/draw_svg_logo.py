@@ -1,5 +1,6 @@
 import drawSvg as draw
 from pathlib import Path
+from embedded_svg_base64_font import EMBEDDED_FONT
 
 class Hyperlink(draw.DrawingParentElement):
     TAG_NAME = 'a'
@@ -12,13 +13,13 @@ class Hyperlink(draw.DrawingParentElement):
 
 fpath = str(Path.cwd() / 'docs' / 'torchimize_logo.svg')
 
-d = draw.Drawing(270, 80, origin=(0, 0), displayInline=False)
+d = draw.Drawing(240, 80, origin=(0, 0), displayInline=False)
 
 lettering = 'torchimize'
-tlayer1 = draw.Text(lettering, 50, x=0, y=10, center=0.0, fill='#444444', font="FreightSansLFPro")
-tlayer2 = draw.Text(lettering, 50, x=0, y=20, center=0.0, fill='#888888', font="FreightSansLFPro")
-tlayer3 = draw.Text(lettering, 50, x=0, y=30, center=0.0, fill='#cccccc', font="FreightSansLFPro")
-tlayer4 = draw.Text(lettering, 50, x=0, y=40, center=0.0, fill='#ee4c2c', font="FreightSansLFPro")
+tlayer1 = draw.Text(lettering, 50, x=0, y=10, center=0.0, fill='#444444', font_family="FreightSansLFPro")
+tlayer2 = draw.Text(lettering, 50, x=0, y=20, center=0.0, fill='#888888', font_family="FreightSansLFPro")
+tlayer3 = draw.Text(lettering, 50, x=0, y=30, center=0.0, fill='#cccccc', font_family="FreightSansLFPro")
+tlayer4 = draw.Text(lettering, 50, x=0, y=40, center=0.0, fill='#ee4c2c', font_family="FreightSansLFPro")
 
 duration = '3s'
 tlayer1.appendAnim(draw.Animate('y', duration, '-6;-16;-16;-6;', repeatCount='indefinite'))
@@ -39,8 +40,8 @@ d.saveSvg(fpath)
 d.savePng(fpath.replace('.svg','.png'))
 
 # customize svg with line replacement
-to_be_replaced = None
-replaced_by = r'<text style="font: 40 FreightSansLFPro; fill:#ee4c2c;">'
+to_be_replaced = '</defs>'
+replaced_by = EMBEDDED_FONT+'</defs>'
 if to_be_replaced:
     with open(fpath, 'r') as f, open(fpath.replace('.svg', '_font.svg'), 'w') as of:
         for line in f:

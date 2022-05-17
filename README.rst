@@ -50,7 +50,7 @@ For further details, see the |apidoc|_.
 
 .. substitutions
 
-.. |logo| image:: https://github.com/hahnec/torchimize/blob/develop/docs/torchimize_logo.svg
+.. |logo| image:: https://github.com/hahnec/torchimize/blob/develop/docs/torchimize_logo_font.svg
     :target: https://hahnec.github.io/torchimize/
     :width: 400 px
     :scale: 100 %
