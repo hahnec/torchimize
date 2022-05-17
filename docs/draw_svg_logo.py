@@ -12,13 +12,13 @@ class Hyperlink(draw.DrawingParentElement):
 
 fpath = str(Path.cwd() / 'docs' / 'torchimize_logo.svg')
 
-d = draw.Drawing(300, 100, origin=(0, 0), displayInline=False)
+d = draw.Drawing(270, 80, origin=(0, 0), displayInline=False)
 
 lettering = 'torchimize'
-tlayer1 = draw.Text(lettering, 50, x=20, y=10, center=0.0, fill='#444444', font="FreightSansLFPro")
-tlayer2 = draw.Text(lettering, 50, x=20, y=20, center=0.0, fill='#888888', font="FreightSansLFPro")
-tlayer3 = draw.Text(lettering, 50, x=20, y=30, center=0.0, fill='#cccccc', font="FreightSansLFPro")
-tlayer4 = draw.Text(lettering, 50, x=20, y=40, center=0.0, fill='#ee4c2c', font="FreightSansLFPro")
+tlayer1 = draw.Text(lettering, 50, x=0, y=10, center=0.0, fill='#444444', font="FreightSansLFPro")
+tlayer2 = draw.Text(lettering, 50, x=0, y=20, center=0.0, fill='#888888', font="FreightSansLFPro")
+tlayer3 = draw.Text(lettering, 50, x=0, y=30, center=0.0, fill='#cccccc', font="FreightSansLFPro")
+tlayer4 = draw.Text(lettering, 50, x=0, y=40, center=0.0, fill='#ee4c2c', font="FreightSansLFPro")
 
 duration = '3s'
 tlayer1.appendAnim(draw.Animate('y', duration, '-6;-16;-6', repeatCount='indefinite'))
