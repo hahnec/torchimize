@@ -6,16 +6,11 @@ API documentation
    :maxdepth: 3
    :caption: Contents:
 
-lsq_gna
--------
+
+.. automodule:: torchimize.functions
+   :members:
 .. autofunction:: torchimize.functions.lsq_gna
-
-lsq_lma
--------
 .. autofunction:: torchimize.functions.lsq_lma
-
-lsq_gna_parallel
-----------------
 .. autofunction:: torchimize.functions.lsq_gna_parallel
 
 .. Indices and tables

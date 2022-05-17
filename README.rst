@@ -1,6 +1,4 @@
-==========
-torchimize
-==========
+|logo|
 
 ..
 
@@ -16,8 +14,8 @@ Installation
 
 ``$ python3 -m pip install torchimize``
 
-Functional API Usage
-====================
+Kick-Start
+==========
 
 .. code-block:: python
 
@@ -52,9 +50,14 @@ For further details, see the |apidoc|_.
 
 .. substitutions
 
+.. |logo| image:: http://wp12283669.server-he.de/Xchange/torchimize_logo.svg
+    :width: 200 px
+    :scale: 50 %
+    :alt: torchimize
+
 .. |coverage| image:: https://coveralls.io/repos/github/hahnec/torchimize/badge.svg?branch=master
     :target: https://coveralls.io/github/hahnec/torchimize
-    :width: 100
+    :width: 98
 
 .. |tests_develop| image:: https://img.shields.io/github/workflow/status/hahnec/torchimize/torchimize%20unit%20tests/develop?label=tests%20on%20develop
     :target: https://github.com/hahnec/torchimize/actions/
@@ -72,7 +75,7 @@ For further details, see the |apidoc|_.
 .. |pypi| image:: https://img.shields.io/pypi/dm/torchimize?label=PyPI%20downloads
     :target: https://pypi.org/project/torchimize/
     :alt: PyPI Downloads
-    :width: 150
+    :width: 160
 
 .. |apidoc| replace:: **API documentation**
 .. _apidoc: https://hahnec.github.io/torchimize/build/html/index.html
