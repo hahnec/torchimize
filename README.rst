@@ -79,7 +79,7 @@ For further details, see the |apidoc|_.
     :width: 160
 
 .. |apidoc| replace:: **API documentation**
-.. _apidoc: https://hahnec.github.io/torchimize/build/html/index.html
+.. _apidoc: https://hahnec.github.io/torchimize/build/html/apidoc.html
 
 Citation
 ========
