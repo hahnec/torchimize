@@ -12,6 +12,7 @@ API documentation
 .. autofunction:: torchimize.functions.lsq_gna
 .. autofunction:: torchimize.functions.lsq_lma
 .. autofunction:: torchimize.functions.lsq_gna_parallel
+.. autofunction:: torchimize.functions.lsq_gna_plain
 
 .. Indices and tables
 .. ==================
