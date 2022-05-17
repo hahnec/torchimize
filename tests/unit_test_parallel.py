@@ -17,7 +17,7 @@ __license__ = """
 import unittest
 import torch
 
-from torchimize.functions import lsq_gna_parallel
+from torchimize.functions import lsq_gna_parallel, lsq_gna_parallel_plain
 from tests.emg_mm import *
 
 class ParallelOptimizationTest(unittest.TestCase):
@@ -34,18 +34,18 @@ class ParallelOptimizationTest(unittest.TestCase):
         gt_params_list = [[10, -1, 80, 5], [5, -2, 60, 5], [8, 0, 90, 3], [10, -1, 80, 5], [5, -2, 60, 5], [8, 0, 90, 3]]
         initials_list = [[7.5, -.75, 10, 3], [6, -1, 50, 4], [7, -1, 80, 4], [7.5, -.75, 10, 3], [6, -1, 50, 4], [7, -1, 80, 4]]
         channel_num = len(gt_params_list)
-        self.gt_params = torch.tensor(gt_params_list, dtype=torch.float64, device=self.device)
-        self.initials = torch.tensor(initials_list, dtype=torch.float64, device=self.device, requires_grad=True)
+        self.gt_params = torch.tensor(gt_params_list, dtype=torch.float64, device=self.device, requires_grad=False)
+        self.initials = torch.tensor(initials_list, dtype=torch.float64, device=self.device, requires_grad=False)
         
         self.cost_batch = lambda p_batch, t, y: (y-self.emg_model_batch(p_batch, t))**2
 
-        self.t = torch.linspace(-1e3, 1e3, int(2e3), device=self.device)
+        self.t = torch.linspace(-1e3, 1e3, int(2e3), device=self.device, requires_grad=False)
         self.data_channels = []
         self.initials_list = []
         for i in range(channel_num):
             torch.manual_seed(3008+i)
             data = self.emg_model(self.gt_params[i, ...], t=self.t)
-            self.data_channels.append(data + .01 * torch.randn(len(data), dtype=torch.float64, device=self.device))
+            self.data_channels.append(data + .01 * torch.randn(len(data), dtype=torch.float64, device=self.device, requires_grad=False))
             self.initials_list.append(self.initials[i, ...])
         self.batch_data_channels = torch.stack(self.data_channels, dim=0)
         self.batch_initials = torch.stack(self.initials_list, dim=0)
@@ -57,7 +57,7 @@ class ParallelOptimizationTest(unittest.TestCase):
 
         return torch.stack([cost_a, cost_b], dim=1)
 
-    def multi_jac_batch(self, p_batch, t=None, data=None):
+    def multi_jaco_batch(self, p_batch, t=None, data=None):
 
         jac_a = self.emg_jac_batch(p_batch, t=t, data=data)
         jac_b = self.emg_jac_batch(p_batch, t=t, data=data)
@@ -117,12 +117,12 @@ class ParallelOptimizationTest(unittest.TestCase):
 
         return jacobian
 
-    def test_gna_emg_analytical(self):
+    def test_gna_emg_conditions(self):
 
         coeffs = lsq_gna_parallel(
             p = self.batch_initials,
             function = self.multi_cost_batch,
-            jac_function = self.multi_jac_batch,
+            jac_function = self.multi_jaco_batch,
             args = (self.t, self.batch_data_channels),
             l = .1,
             gtol = 1e-6,
@@ -133,6 +133,27 @@ class ParallelOptimizationTest(unittest.TestCase):
         ret_params = torch.allclose(coeffs[-1], self.gt_params, atol=1e-1)
         self.assertTrue(ret_params, 'Coefficients deviate')
         eps = torch.sum(self.cost_batch(coeffs[-1], t=self.t, y=self.batch_data_channels))
+        self.assertTrue(eps.cpu()/len(self.gt_params) < 1, 'Error exceeded 1')
+        self.assertTrue(len(coeffs) < 200, 'Number of iterations exceeded 200')
+
+    def test_gna_emg_plain(self):
+
+        multi_cost_batch_args = lambda p, t=self.t, y=self.batch_data_channels: self.multi_cost_batch(p_batch=p, t=t, y=y)
+        multi_jaco_batch_args = lambda p, t=self.t, y=self.batch_data_channels: self.multi_jaco_batch(p_batch=p, t=t, data=y)
+
+        coeffs = lsq_gna_parallel_plain(
+            p = self.batch_initials,
+            function = multi_cost_batch_args,
+            jac_function = multi_jaco_batch_args,
+            wvec = torch.ones(2, device=self.device, dtype=torch.float64, requires_grad=False),
+            l = .1,
+            max_iter = 199,
+        )
+
+        # assertion
+        ret_params = torch.allclose(coeffs, self.gt_params, atol=1e-1)
+        self.assertTrue(ret_params, 'Coefficients deviate')
+        eps = torch.sum(multi_cost_batch_args(coeffs))
         self.assertTrue(eps.cpu()/len(self.gt_params) < 1, 'Error exceeded 1')
         self.assertTrue(len(coeffs) < 200, 'Number of iterations exceeded 200')
 
@@ -153,7 +174,8 @@ class ParallelOptimizationTest(unittest.TestCase):
 
     def test_all(self):
 
-        self.test_gna_emg_analytical()
+        self.test_gna_emg_conditions()
+        self.test_gna_emg_plain()
         #self._test_lma_emg_analytical()
 
 
