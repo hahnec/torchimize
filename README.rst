@@ -52,7 +52,7 @@ For further details, see the |apidoc|_.
 
 .. |logo| image:: http://wp12283669.server-he.de/Xchange/torchimize_logo.svg
     :width: 200 px
-    :scale: 50 %
+    :scale: 100 %
     :alt: torchimize
 
 .. |coverage| image:: https://coveralls.io/repos/github/hahnec/torchimize/badge.svg?branch=master
