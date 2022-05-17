@@ -51,7 +51,7 @@ For further details, see the |apidoc|_.
 .. substitutions
 
 .. |logo| image:: http://wp12283669.server-he.de/Xchange/torchimize_logo.svg
-    :width: 200 px
+    :width: 400 px
     :scale: 100 %
     :alt: torchimize
 
