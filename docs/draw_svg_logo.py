@@ -16,16 +16,16 @@ fpath = str(Path.cwd() / 'docs' / 'torchimize_logo.svg')
 d = draw.Drawing(240, 80, origin=(0, 0), displayInline=False)
 
 lettering = 'torchimize'
-tlayer1 = draw.Text(lettering, 50, x=0, y=10, center=0.0, fill='#444444', font_family="FreightSansLFPro")
-tlayer2 = draw.Text(lettering, 50, x=0, y=20, center=0.0, fill='#888888', font_family="FreightSansLFPro")
-tlayer3 = draw.Text(lettering, 50, x=0, y=30, center=0.0, fill='#cccccc', font_family="FreightSansLFPro")
+tlayer1 = draw.Text(lettering, 50, x=0, y=10, center=0.0, fill='#dddddd', font_family="FreightSansLFPro")
+tlayer2 = draw.Text(lettering, 50, x=0, y=20, center=0.0, fill='#aaaaaa', font_family="FreightSansLFPro")
+tlayer3 = draw.Text(lettering, 50, x=0, y=30, center=0.0, fill='#666666', font_family="FreightSansLFPro")
 tlayer4 = draw.Text(lettering, 50, x=0, y=40, center=0.0, fill='#ee4c2c', font_family="FreightSansLFPro")
 
-duration = '3s'
-tlayer1.appendAnim(draw.Animate('y', duration, '-6;-16;-16;-6;', repeatCount='indefinite'))
-tlayer2.appendAnim(draw.Animate('y', duration, '-13;-18;-18;-13;', repeatCount='indefinite'))
-tlayer3.appendAnim(draw.Animate('y', duration, '-25;-20;-20;-25;', repeatCount='indefinite'))
-tlayer4.appendAnim(draw.Animate('y', duration, '-32;-22;-22;-32', repeatCount='indefinite'))
+duration = '2s'
+tlayer1.appendAnim(draw.Animate('y', duration, '-4;-16;-16;-4;', repeatCount='indefinite'))
+tlayer2.appendAnim(draw.Animate('y', duration, '-12;-18;-18;-12;', repeatCount='indefinite'))
+tlayer3.appendAnim(draw.Animate('y', duration, '-26;-20;-20;-26;', repeatCount='indefinite'))
+tlayer4.appendAnim(draw.Animate('y', duration, '-34;-22;-22;-34', repeatCount='indefinite'))
 
 # create hyperlink
 hlink = Hyperlink('https://hahnec.github.io/torchimize/build/html/index.html', target='_blank', transform='skewY(0)')

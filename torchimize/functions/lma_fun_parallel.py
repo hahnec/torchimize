@@ -81,7 +81,6 @@ def lsq_lma_parallel(
     p_list = [p.clone().detach()]
     while len(p_list) < max_iter:
         D *= torch.ones_like(H) if meth == 'lev' else torch.max(torch.maximum(H.diagonal(dim1=2), D.diagonal(dim1=2)), dim=1)[0][..., None, None]
-
         h = -torch.linalg.lstsq(H+u[:, None, None]*D, g, rcond=None, driver=None)[0]
         f_h = fun(p+h)
         rho_denom = torch.bmm(h[:, None, :], (u[:, None]*h-g)[:, :, None])[:, 0, 0]
