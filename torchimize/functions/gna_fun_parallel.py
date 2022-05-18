@@ -126,13 +126,8 @@ def gauss_newton_step(
     :param p: current guess
     :param function: user-provided function which takes p (and additional arguments) as input
     :param jac_fun: user-provided Jacobian function which takes p (and additional arguments) as input
-    :param args: optional arguments passed to function
     :param wvec: weights vector used in reduction of multiple costs
-    :param ftol: relative change in cost function as stop condition
-    :param ptol: relative change in independant variables as stop condition
-    :param gtol: maximum gradient tolerance as stop condition
     :param l: learning rate
-    :param max_iter: maximum number of iterations
     :return: list of results
     """
 
