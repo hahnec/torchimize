@@ -70,8 +70,8 @@ def lsq_gna_parallel(
     wvec = torch.ones(f.shape[1], dtype=p.dtype, device=p.device, requires_grad=False) if wvec is None else wvec
     assert len(wvec) == f.shape[1], 'weights vector length is supposed to match number of costs'
 
-    f = torch.tensor(0)
     p_list = []
+    f = torch.zeros_like(f)
     while len(p_list) < max_iter:
         f_prev = f.clone()
         p, f, g, h = gauss_newton_step(p, fun, jac_fun, wvec, l)
@@ -119,7 +119,7 @@ def gauss_newton_step(
         jac_function: Callable,
         wvec: torch.Tensor,
         l: float = 1.,
-    ) -> List[torch.Tensor] :
+    ) -> Tuple[torch.Tensor, torch.Tensor, torch.Tensor, torch.Tensor]:
     """
     Gauss-Newton step function for parallel least-squares fitting of non-linear functions
 
