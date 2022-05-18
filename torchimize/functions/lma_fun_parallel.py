@@ -23,8 +23,9 @@ from torchimize.functions.jacobian import jacobian_approx_t
 def lsq_lma_parallel(
         p: torch.Tensor,
         function: Callable, 
-        jac_function: Callable = None, 
-        args: Union[Tuple, List] = (), 
+        jac_function: Callable = None,
+        args: Union[Tuple, List] = (),
+        wvec: torch.Tensor = None,
         ftol: float = 1e-8,
         ptol: float = 1e-8,
         gtol: float = 1e-8,
@@ -32,8 +33,8 @@ def lsq_lma_parallel(
         meth: str = 'lev',
         rho1: float = .25, 
         rho2: float = .75, 
-        bet: float = 2, 
-        gam: float = 3, 
+        beta: float = 2, 
+        gama: float = 3, 
         max_iter: int = 100, 
     ) -> List[torch.Tensor]:
     """
@@ -50,8 +51,8 @@ def lsq_lma_parallel(
     :param meth: method which is default 'lev' for Levenberg and otherwise Marquardt
     :param rho1: first gain factor threshold for damping parameter adjustment for Marquardt
     :param rho2: second gain factor threshold for damping parameter adjustment for Marquardt
-    :param bet: multiplier for damping parameter adjustment for Marquardt
-    :param gam: divisor for damping parameter adjustment for Marquardt
+    :param beta: multiplier for damping parameter adjustment for Marquardt
+    :param gama: divisor for damping parameter adjustment for Marquardt
     :param max_iter: maximum number of iterations
     :return: list of results
     """
@@ -68,42 +69,38 @@ def lsq_lma_parallel(
     else:
         jac_fun = lambda p: jac_function(p, *args)
 
-    f = fun(p)
-    j = jac_fun(p)
-    g = torch.bmm(j.transpose(-2, -1), f[..., None])[..., 0]
-    H = torch.bmm(j.transpose(-2, -1), j)
-    D = torch.eye(j.shape[-1], dtype=p.dtype, device=j.device)[None, ...].repeat(j.shape[0], 1, 1)
-    u = tau * torch.max(torch.diagonal(H, dim1=-2, dim2=-1), 1)[0]
+    D = torch.eye(p.shape[-1], dtype=p.dtype, device=p.device)[None, ...].repeat(p.shape[0], 1, 1)
+    u = tau * torch.max(torch.diagonal(D, dim1=-2, dim2=-1), 1)[0]
     sinf = torch.tensor([-torch.inf, torch.inf], dtype=p.dtype, device=p.device)
     ones = torch.ones(p.shape[0], dtype=p.dtype, device=p.device)
     v = 2*ones
-    f_prev = f.clone()
-    p_list = [p.clone().detach()]
+
+    if meth == 'lev':
+        lm_uv_step = lambda rho, u, v: levenberg_uv(rho, u, v, ones=ones)
+        lm_dg_step = lambda H, D: D * torch.ones_like(H)
+    else:
+        lm_uv_step = lambda rho, u, v=None: marquardt_uv(rho, u, v, rho1=rho1, rho2=rho2, beta=beta, gama=gama)
+        lm_dg_step = lambda H, D: D * torch.max(torch.maximum(H.diagonal(dim1=2), D.diagonal(dim1=2)), dim=1)[0][..., None, None]
+
+    p_list = []
+    f_prev = torch.zeros_like(fun(p))
     while len(p_list) < max_iter:
-        D *= torch.ones_like(H) if meth == 'lev' else torch.max(torch.maximum(H.diagonal(dim1=2), D.diagonal(dim1=2)), dim=1)[0][..., None, None]
+
+        p, f, g, H = newton_2nd_order_step(p, fun, jac_fun, wvec)
+
+        # levenberg-marquardt diagonal
+        D = lm_dg_step(H, D)
 
         h = -torch.linalg.lstsq(H+u[:, None, None]*D, g, rcond=None, driver=None)[0]
         f_h = fun(p+h)
-        rho_denom = torch.bmm(h[:, None, :], (u[:, None]*h-g)[:, :, None])[:, 0, 0]
-        rho_nom = torch.bmm(f[:, None, :], f[..., None]).flatten() - torch.bmm(f_h[:, None, :], f_h[..., None]).flatten()
-        rho = torch.zeros(p.shape[0], dtype=p.dtype, device=p.device)
-        rho[rho_denom>0] = (rho_nom / rho_denom)[rho_denom>0]
+        rho_denom = torch.einsum('bnp,bni->bi', h[..., None], (u[:, None]*h-g)[..., None])[..., 0]
+        rho_nom = torch.einsum('bcp,bci->bc', f, f).sum(1) - torch.einsum('bcp,bci->bc', f_h, f_h).sum(1)
+        rho = rho_nom / rho_denom
         rho[rho_denom<0] = sinf[(rho_nom > 0).type(torch.int64)][rho_denom<0]
         p[rho>0, ...] = p[rho>0, ...] + h[rho>0, ...]
-        j[rho>0, ...] = jac_fun(p)[rho>0, ...]
-        g[rho>0, ...] = torch.bmm(j.transpose(-2, -1), f[..., None])[rho>0, :, 0]
-        H[rho>0, ...] = torch.bmm(j.transpose(-2, -1), j)[rho>0, ...]
         p_list.append(p.clone().detach())
-        f_prev = f.clone()
-        f = fun(p)
-        if meth == 'lev':
-            u[rho>0] *= torch.maximum(ones/3, 1-(2*rho-1)**3)[rho>0]
-            u[rho<0] *= v[rho<0]
-            v[rho>0] = 2*ones[rho>0]
-            v[rho<0] *= 2
-        else:
-            u[rho < rho1] *= bet
-            u[rho > rho2] /= gam
+
+        u, v = lm_uv_step(rho, u, v)
 
         # stop conditions
         gcon = torch.max(abs(g)) < gtol
@@ -111,7 +108,54 @@ def lsq_lma_parallel(
         fcon = ((f_prev-f)**2).sum() < ((ftol*f)**2).sum() if (rho > 0).sum() > 0 else False
         if gcon or pcon or fcon:
             break
-    
-    [print(p[0].cpu().detach()) for p in p_list]
+        f_prev = f.clone()
 
     return p_list
+
+
+def levenberg_uv(
+        rho: torch.Tensor,
+        u: torch.Tensor,
+        v: torch.Tensor,
+        ones: torch.Tensor,
+    ) -> Tuple[torch.Tensor, torch.Tensor]:
+
+    u[rho>0] *= torch.maximum(ones/3, 1-(2*rho-1)**3)[rho>0]
+    u[rho<0] *= v[rho<0]
+    v[rho>0] = 2*ones[rho>0]
+    v[rho<0] *= 2
+
+    return u, v
+
+
+def marquardt_uv(
+        rho: torch.Tensor,
+        u: torch.Tensor,
+        v: torch.Tensor,
+        rho1: float,
+        rho2: float,
+        beta: float,
+        gama: float,
+    ) -> Tuple[torch.Tensor, torch.Tensor]:
+
+    u[rho < rho1] *= beta
+    u[rho > rho2] /= gama
+
+    return u, v
+
+
+def newton_2nd_order_step(        
+        p: torch.Tensor,
+        function: Callable,
+        jac_function: Callable,
+        wvec: torch.Tensor,
+    ) -> Tuple[torch.Tensor, torch.Tensor, torch.Tensor, torch.Tensor]:
+
+    f = function(p)
+    j = jac_function(p)
+    gc = torch.einsum('bcnp,bcnp->bcp', j, f[..., None])
+    Hc = torch.einsum('bcnp,bcni->bcpi', j, j)
+    g = torch.einsum('bcp,c->bp', gc, wvec)
+    H = torch.einsum('bcpi,c->bpi', Hc, wvec)
+
+    return p, f, g, H
