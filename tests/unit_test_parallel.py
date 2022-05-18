@@ -157,16 +157,24 @@ class ParallelOptimizationTest(unittest.TestCase):
         self.assertTrue(eps.cpu()/len(self.gt_params) < 1, 'Error exceeded 1')
         self.assertTrue(len(coeffs) < 200, 'Number of iterations exceeded 200')
 
-    def _test_lma_emg_analytical(self):
+    def test_lma_emg_conditions(self):
 
         from torchimize.functions.lma_fun_parallel import lsq_lma_parallel
 
         for m in ['lev', 'marq']:
 
-            coeffs = lsq_lma_parallel(self.batch_initials, self.cost_batch, jac_function=self.emg_jac_batch, args=(self.t, self.batch_data_channels), meth=m, ptol=1e-11, max_iter=199)
+            coeffs = lsq_lma_parallel(
+                self.batch_initials,
+                function = self.multi_cost_batch,
+                jac_function = self.multi_jaco_batch,
+                args = (self.t, self.batch_data_channels),
+                wvec = torch.ones(2, device=self.device, dtype=torch.float64, requires_grad=False),
+                meth = m,
+                max_iter = 199,
+            )
 
             # assertion
-            ret_params = torch.allclose(torch.round(coeffs[-1]), self.gt_params, atol=1e-1)
+            ret_params = torch.allclose(coeffs[-1], self.gt_params, atol=1e-1)
             self.assertTrue(ret_params, 'Coefficients deviate')
             eps = torch.sum(self.cost_batch(coeffs[-1], t=self.t, y=self.batch_data_channels))
             self.assertTrue(eps.cpu()/len(self.gt_params) < 1, 'Error exceeded 1')
@@ -174,9 +182,9 @@ class ParallelOptimizationTest(unittest.TestCase):
 
     def test_all(self):
 
+        self.test_lma_emg_conditions()
         self.test_gna_emg_conditions()
         self.test_gna_emg_plain()
-        #self._test_lma_emg_analytical()
 
 
 if __name__ == '__main__':
