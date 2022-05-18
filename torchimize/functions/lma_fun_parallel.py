@@ -44,6 +44,7 @@ def lsq_lma_parallel(
     :param function: user-provided function which takes p (and additional arguments) as input
     :param jac_fun: user-provided Jacobian function which takes p (and additional arguments) as input
     :param args: optional arguments passed to function
+    :param wvec: weights vector used in reduction of multiple costs
     :param ftol: relative change in cost function as stop condition
     :param ptol: relative change in independant variables as stop condition
     :param gtol: maximum gradient tolerance as stop condition
@@ -86,21 +87,17 @@ def lsq_lma_parallel(
     f_prev = torch.zeros_like(fun(p))
     while len(p_list) < max_iter:
 
+        # levenberg-marquardt step
         p, f, g, H = newton_2nd_order_step(p, fun, jac_fun, wvec)
-
-        # levenberg-marquardt diagonal
         D = lm_dg_step(H, D)
-
         h = -torch.linalg.lstsq(H+u[:, None, None]*D, g, rcond=None, driver=None)[0]
         f_h = fun(p+h)
         rho_denom = torch.einsum('bnp,bni->bi', h[..., None], (u[:, None]*h-g)[..., None])[..., 0]
         rho_nom = torch.einsum('bcp,bci->bc', f, f).sum(1) - torch.einsum('bcp,bci->bc', f_h, f_h).sum(1)
         rho = rho_nom / rho_denom
         rho[rho_denom<0] = sinf[(rho_nom > 0).type(torch.int64)][rho_denom<0]
-        p[rho>0, ...] = p[rho>0, ...] + h[rho>0, ...]
-        p_list.append(p.clone().detach())
-
         u, v = lm_uv_step(rho, u, v)
+        p[rho>0, ...] += h[rho>0, ...]
 
         # stop conditions
         gcon = torch.max(abs(g)) < gtol
@@ -108,7 +105,9 @@ def lsq_lma_parallel(
         fcon = ((f_prev-f)**2).sum() < ((ftol*f)**2).sum() if (rho > 0).sum() > 0 else False
         if gcon or pcon or fcon:
             break
+
         f_prev = f.clone()
+        p_list.append(p.clone())
 
     return p_list
 
@@ -150,6 +149,16 @@ def newton_2nd_order_step(
         jac_function: Callable,
         wvec: torch.Tensor,
     ) -> Tuple[torch.Tensor, torch.Tensor, torch.Tensor, torch.Tensor]:
+
+    """
+    Newton second order step function for parallel least-squares fitting of non-linear functions
+
+    :param p: current guess
+    :param function: user-provided function which takes p (and additional arguments) as input
+    :param jac_fun: user-provided Jacobian function which takes p (and additional arguments) as input
+    :param wvec: weights vector used in reduction of multiple costs
+    :return: list of results
+    """
 
     f = function(p)
     j = jac_function(p)
