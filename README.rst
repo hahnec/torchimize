@@ -39,6 +39,21 @@ Kick-Start
                         ptol = 1e-8,
                         gtol = 1e-8,
                         l = .1,
+                        max_iter = 80,
+                    )
+
+    # parallel levenberg-marquardt for batch-optimization at multiple costs
+    from torchimize.functions import lsq_lma_parallel
+    coeffs_list = lsq_lma_parallel(
+                        p = initials_batch,
+                        function = multi_cost_fun_batch,
+                        jac_function = multi_jac_fun_batch,
+                        args = (other_args,),
+                        wvec = torch.ones(5, device='cuda', dtype=torch.float64),
+                        ftol = 1e-8,
+                        ptol = 1e-8,
+                        gtol = 1e-8,
+                        meth: str = 'lev',
                         max_iter = 40,
                     )
 
