@@ -53,7 +53,7 @@ Kick-Start
                         ftol = 1e-8,
                         ptol = 1e-8,
                         gtol = 1e-8,
-                        meth: str = 'lev',
+                        meth = 'lev',
                         max_iter = 40,
                     )
 
