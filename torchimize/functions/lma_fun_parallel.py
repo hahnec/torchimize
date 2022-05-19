@@ -92,10 +92,10 @@ def lsq_lma_parallel(
         D = lm_dg_step(H, D)
         h = -torch.linalg.lstsq(H+u[:, None, None]*D, g, rcond=None, driver=None)[0]
         f_h = fun(p+h)
-        rho_denom = torch.einsum('bnp,bni->bi', h[..., None], (u[:, None]*h-g)[..., None])[..., 0]
         rho_nom = torch.einsum('bcp,bci->bc', f, f).sum(1) - torch.einsum('bcp,bci->bc', f_h, f_h).sum(1)
+        rho_denom = torch.einsum('bnp,bni->bi', h[..., None], (u[:, None]*h-g)[..., None])[..., 0]
         rho = rho_nom / rho_denom
-        rho[rho_denom<0] = sinf[(rho_nom > 0).type(torch.int64)][rho_denom<0]
+        rho[rho_denom==0] = sinf[(rho_nom > 0).type(torch.int64)][rho_denom==0]
         u, v = lm_uv_step(rho, u, v)
         p[rho>0, ...] += h[rho>0, ...]
 
