@@ -88,7 +88,7 @@ def lsq_lma(
             j = jac_fun(p)
             g = torch.matmul(j.T, fun(p))
             H = torch.matmul(j.T, j)
-        p_list.append(p.detach())
+        p_list.append(p.clone())
         f_prev = f.clone()
         f = fun(p)
         if meth == 'lev':

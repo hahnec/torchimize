@@ -77,7 +77,7 @@ def lsq_gna_parallel(
     while len(p_list) < max_iter:
         f_prev = f.clone()
         p, f, g, h = gauss_newton_step(p, fun, jac_fun, wvec, l)
-        p_list.append(p.detach())
+        p_list.append(p.clone())
 
         # stop conditions
         gcon = torch.max(abs(g)) < gtol
