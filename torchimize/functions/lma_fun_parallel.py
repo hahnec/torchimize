@@ -70,7 +70,7 @@ def lsq_lma_parallel(
     else:
         jac_fun = lambda p: jac_function(p, *args)
     
-    assert len(p.shape) == 2, 'parameter tensor is supposed to have 2 dims, but has %s' % len(p.shape)
+    assert len(p.shape) == 2, 'parameter tensor is supposed to have 2 dims, but has %s' % str(len(p.shape))
 
     D = torch.eye(p.shape[-1], dtype=p.dtype, device=p.device)[None, ...].repeat(p.shape[0], 1, 1)
     u = tau * torch.max(torch.diagonal(D, dim1=-2, dim2=-1), 1)[0]

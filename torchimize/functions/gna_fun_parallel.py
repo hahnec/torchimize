@@ -60,17 +60,17 @@ def lsq_gna_parallel(
     else:
         jac_fun = lambda p: jac_function(p, *args)
 
-    assert len(p.shape) == 2, 'parameter tensor is supposed to have 2 dims, but has %s' % len(p.shape)
+    assert len(p.shape) == 2, 'parameter tensor is supposed to have 2 dims, but has %s' % str(len(p.shape))
 
     f = fun(p)
-    assert len(f.shape) == 3, 'residual tensor is supposed to have 3 dims, but has %s' % len(f.shape)
+    assert len(f.shape) == 3, 'residual tensor is supposed to have 3 dims, but has %s' % str(len(f.shape))
 
     j = jac_fun(p)
-    assert len(j.shape) == 4, 'jacobian tensor is supposed to have 4 dims, but has %s' % len(j.shape)
+    assert len(j.shape) == 4, 'jacobian tensor is supposed to have 4 dims, but has %s' % str(len(j.shape))
 
     # use weights of ones as default
     wvec = torch.ones(f.shape[1], dtype=p.dtype, device=p.device, requires_grad=False) if wvec is None else wvec
-    assert len(wvec) == f.shape[1], 'weights vector length is supposed to match number of costs'
+    assert len(wvec) == f.shape[1], 'weights vector length of %s is supposed to match cost number which is %s' % (str(len(wvec)), str(f.shape[1]))
 
     p_list = []
     f = torch.zeros_like(f)
