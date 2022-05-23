@@ -82,7 +82,7 @@ def lsq_gna_parallel(
         # stop conditions
         gcon = torch.max(abs(g)) < gtol
         pcon = (h**2).sum()**.5 < ptol*(ptol + (p**2).sum()**.5)
-        fcon = ((f_prev-f)**2).sum() < ((ftol*f)**2).sum()
+        fcon = ((f_prev-f)**2).sum() < ((ftol*f)**2).sum() if f_prev.shape == f.shape else False
         if gcon or pcon or fcon:
             break
 
