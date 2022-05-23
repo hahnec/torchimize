@@ -124,6 +124,7 @@ class ParallelOptimizationTest(unittest.TestCase):
             function = self.multi_cost_batch,
             jac_function = self.multi_jaco_batch,
             args = (self.t, self.batch_data_channels),
+            wvec = torch.ones(2, device=self.device, dtype=torch.float64, requires_grad=False),
             l = .1,
             gtol = 1e-6,
             max_iter = 199,

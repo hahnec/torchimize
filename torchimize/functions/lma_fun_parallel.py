@@ -72,9 +72,6 @@ def lsq_lma_parallel(
     
     assert len(p.shape) == 2, 'parameter tensor is supposed to have 2 dims, but has %s' % str(len(p.shape))
 
-    # use weights of ones as default
-    wvec = torch.ones(f.shape[1], dtype=p.dtype, device=p.device, requires_grad=False) if wvec is None else wvec
-
     D = torch.eye(p.shape[-1], dtype=p.dtype, device=p.device)[None, ...].repeat(p.shape[0], 1, 1)
     u = tau * torch.max(torch.diagonal(D, dim1=-2, dim2=-1), 1)[0]
     sinf = torch.tensor([-torch.inf, torch.inf], dtype=p.dtype, device=p.device)
@@ -103,14 +100,13 @@ def lsq_lma_parallel(
         rho[rho_denom==0] = sinf[(rho_nom > 0).type(torch.int64)][rho_denom==0]
         u, v = lm_uv_step(rho, u, v)
         p[rho>0, ...] += h[rho>0, ...]
+        p_list.append(p.clone())
 
         # stop conditions
         gcon = torch.max(abs(g)) < gtol
         pcon = (h**2).sum()**.5 < ptol*(ptol + (p**2).sum()**.5)
         fcon = ((f_prev-f)**2).sum() < ((ftol*f)**2).sum() if (rho > 0).sum() > 0 and f_prev.shape == f.shape else False
-
         f_prev = f.clone()
-        p_list.append(p.clone())
 
         if gcon or pcon or fcon:
             break

@@ -62,13 +62,9 @@ def lsq_gna_parallel(
 
     assert len(p.shape) == 2, 'parameter tensor is supposed to have 2 dims, but has %s' % str(len(p.shape))
 
-    # use weights of ones as default
-    wvec = torch.ones(f.shape[1], dtype=p.dtype, device=p.device, requires_grad=False) if wvec is None else wvec
-
     p_list = []
-    f = torch.zeros(1, device=p.device, dtype=p.dtype)
+    f_prev = torch.zeros(1, device=p.device, dtype=p.dtype)
     while len(p_list) < max_iter:
-        f_prev = f.clone()
         p, f, g, h = gauss_newton_step(p, fun, jac_fun, wvec, l)
         p_list.append(p.clone())
 
@@ -76,6 +72,7 @@ def lsq_gna_parallel(
         gcon = torch.max(abs(g)) < gtol
         pcon = (h**2).sum()**.5 < ptol*(ptol + (p**2).sum()**.5)
         fcon = ((f_prev-f)**2).sum() < ((ftol*f)**2).sum() if f_prev.shape == f.shape else False
+        f_prev = f.clone()
         
         if gcon or pcon or fcon:
             break
