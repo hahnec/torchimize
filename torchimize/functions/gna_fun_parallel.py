@@ -64,7 +64,6 @@ def lsq_gna_parallel(
 
     # use weights of ones as default
     wvec = torch.ones(f.shape[1], dtype=p.dtype, device=p.device, requires_grad=False) if wvec is None else wvec
-    assert len(wvec) == f.shape[1], 'weights vector length of %s is supposed to match cost number which is %s' % (str(len(wvec)), str(f.shape[1]))
 
     p_list = []
     f = torch.zeros(1, device=p.device, dtype=p.dtype)
@@ -88,6 +87,7 @@ def test_fun_dims(
         function: Callable, 
         jac_function: Callable = None,
         args: Union[Tuple, List] = (),
+        wvec: torch.Tensor = None,
     ) -> bool:
     """
     Helper function to test whether dimensionality of output tensors suits the herein provided optimization functions.
@@ -117,6 +117,10 @@ def test_fun_dims(
 
     j = jac_fun(p)
     assert len(j.shape) == 4, 'jacobian tensor is supposed to have 4 dims, but has %s' % str(len(j.shape))
+
+    # use weights of ones as default
+    wvec = torch.ones(f.shape[1], dtype=p.dtype, device=p.device, requires_grad=False) if wvec is None else wvec
+    assert len(wvec) == f.shape[1], 'weights vector length of %s is supposed to match cost number which is %s' % (str(len(wvec)), str(f.shape[1]))
 
     return True
 
