@@ -86,7 +86,7 @@ def lsq_lma_parallel(
         lm_dg_step = lambda H, D: D * torch.max(torch.maximum(H.diagonal(dim1=2), D.diagonal(dim1=2)), dim=1)[0][..., None, None]
 
     p_list = []
-    f_prev = torch.zeros_like(fun(p))
+    f_prev = torch.zero(1, device=p.device, dtype=p.dtype)
     while len(p_list) < max_iter:
 
         # levenberg-marquardt step
@@ -105,11 +105,12 @@ def lsq_lma_parallel(
         gcon = torch.max(abs(g)) < gtol
         pcon = (h**2).sum()**.5 < ptol*(ptol + (p**2).sum()**.5)
         fcon = ((f_prev-f)**2).sum() < ((ftol*f)**2).sum() if (rho > 0).sum() > 0 and f_prev.shape == f.shape else False
-        if gcon or pcon or fcon:
-            break
 
         f_prev = f.clone()
         p_list.append(p.clone())
+
+        if gcon or pcon or fcon:
+            break
 
     return p_list
 
