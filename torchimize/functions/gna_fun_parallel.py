@@ -73,7 +73,7 @@ def lsq_gna_parallel(
     assert len(wvec) == f.shape[1], 'weights vector length of %s is supposed to match cost number which is %s' % (str(len(wvec)), str(f.shape[1]))
 
     p_list = []
-    f = torch.zero(1, device=p.device, dtype=p.dtype)
+    f = torch.zeros(1, device=p.device, dtype=p.dtype)
     while len(p_list) < max_iter:
         f_prev = f.clone()
         p, f, g, h = gauss_newton_step(p, fun, jac_fun, wvec, l)

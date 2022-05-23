@@ -89,7 +89,7 @@ def lsq_lma_parallel(
         lm_dg_step = lambda H, D: D * torch.max(torch.maximum(H.diagonal(dim1=2), D.diagonal(dim1=2)), dim=1)[0][..., None, None]
 
     p_list = []
-    f_prev = torch.zero(1, device=p.device, dtype=p.dtype)
+    f_prev = torch.zeros(1, device=p.device, dtype=p.dtype)
     while len(p_list) < max_iter:
 
         # levenberg-marquardt step
