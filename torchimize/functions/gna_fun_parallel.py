@@ -62,12 +62,6 @@ def lsq_gna_parallel(
 
     assert len(p.shape) == 2, 'parameter tensor is supposed to have 2 dims, but has %s' % str(len(p.shape))
 
-    f = fun(p)
-    assert len(f.shape) == 3, 'residual tensor is supposed to have 3 dims, but has %s' % str(len(f.shape))
-
-    j = jac_fun(p)
-    assert len(j.shape) == 4, 'jacobian tensor is supposed to have 4 dims, but has %s' % str(len(j.shape))
-
     # use weights of ones as default
     wvec = torch.ones(f.shape[1], dtype=p.dtype, device=p.device, requires_grad=False) if wvec is None else wvec
     assert len(wvec) == f.shape[1], 'weights vector length of %s is supposed to match cost number which is %s' % (str(len(wvec)), str(f.shape[1]))
@@ -89,6 +83,42 @@ def lsq_gna_parallel(
 
     return p_list
 
+def test_fun_dims(        
+        p: torch.Tensor,
+        function: Callable, 
+        jac_function: Callable = None,
+        args: Union[Tuple, List] = (),
+    ) -> bool:
+    """
+    Helper function to test whether dimensionality of output tensors suits the herein provided optimization functions.
+
+    :param p: initial value(s)
+    :param function: user-provided function which takes p (and additional arguments) as input
+    :param jac_fun: user-provided Jacobian function which takes p (and additional arguments) as input
+    :param args: optional arguments passed to function
+    """
+
+    if len(args) > 0:
+        # pass optional arguments to function
+        fun = lambda p: function(p, *args)
+    else:
+        fun = function
+
+    if jac_function is None:
+        # use numerical Jacobian if analytical is not provided
+        jac_fun = lambda p: jacobian_approx_t(p, f=fun)
+    else:
+        jac_fun = lambda p: jac_function(p, *args)
+    
+    assert len(p.shape) == 2, 'parameter tensor is supposed to have 2 dims, but has %s' % str(len(p.shape))
+
+    f = fun(p)
+    assert len(f.shape) == 3, 'residual tensor is supposed to have 3 dims, but has %s' % str(len(f.shape))
+
+    j = jac_fun(p)
+    assert len(j.shape) == 4, 'jacobian tensor is supposed to have 4 dims, but has %s' % str(len(j.shape))
+
+    return True
 
 def lsq_gna_parallel_plain(
         p: torch.Tensor,
