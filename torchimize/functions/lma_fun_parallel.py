@@ -18,7 +18,7 @@ import torch
 from typing import Union, Callable, List, Tuple
 
 from torchimize.functions.jacobian import jacobian_approx_t
-from torchimize.functions.newton_parallel import newton_2nd_order_step
+from torchimize.functions.newton_parallel import newton_step_parallel
 
 
 def lsq_lma_parallel(
@@ -91,7 +91,7 @@ def lsq_lma_parallel(
     while len(p_list) < max_iter:
 
         # levenberg-marquardt step
-        p, f, g, H = newton_2nd_order_step(p, fun, jac_fun, wvec)
+        p, f, g, H = newton_step_parallel(p, fun, jac_fun, wvec)
         D = lm_dg_step(H, D)
         Hu = H+u[:, None, None]*D
         h = -torch.linalg.lstsq(Hu.double(), g.double(), rcond=None, driver=None)[0].to(dtype=p.dtype)

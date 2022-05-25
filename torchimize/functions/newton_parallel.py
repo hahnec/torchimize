@@ -18,7 +18,7 @@ import torch
 from typing import Callable, Tuple
 
 
-def newton_2nd_order_step(        
+def newton_step_parallel(        
         p: torch.Tensor,
         function: Callable,
         jac_function: Callable,
