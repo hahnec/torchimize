@@ -324,35 +324,45 @@
 <span class="kn">from</span> <span class="nn">torchimize.functions</span> <span class="kn">import</span> <span class="n">lsq_lma</span>
 <span class="n">coeffs_list</span> <span class="o">=</span> <span class="n">lsq_lma</span><span class="p">(</span><span class="n">initials</span><span class="p">,</span> <span class="n">function</span><span class="o">=</span><span class="n">cost_fun</span><span class="p">,</span> <span class="n">jac_function</span><span class="o">=</span><span class="n">jac_fun</span><span class="p">,</span> <span class="n">args</span><span class="o">=</span><span class="p">(</span><span class="n">other_args</span><span class="p">,))</span>
 
-<span class="c1"># parallel gauss-newton for batch-optimization at multiple costs</span>
+<span class="c1"># parallel gauss-newton for several optimization problems at multiple costs</span>
 <span class="kn">from</span> <span class="nn">torchimize.functions</span> <span class="kn">import</span> <span class="n">lsq_gna_parallel</span>
 <span class="n">coeffs_list</span> <span class="o">=</span> <span class="n">lsq_gna_parallel</span><span class="p">(</span>
                     <span class="n">p</span> <span class="o">=</span> <span class="n">initials_batch</span><span class="p">,</span>
                     <span class="n">function</span> <span class="o">=</span> <span class="n">multi_cost_fun_batch</span><span class="p">,</span>
                     <span class="n">jac_function</span> <span class="o">=</span> <span class="n">multi_jac_fun_batch</span><span class="p">,</span>
                     <span class="n">args</span> <span class="o">=</span> <span class="p">(</span><span class="n">other_args</span><span class="p">,),</span>
-                    <span class="n">wvec</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="mi">5</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="s1">&#39;cuda&#39;</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">float64</span><span class="p">),</span>
+                    <span class="n">wvec</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="mi">5</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="s1">&#39;cuda&#39;</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">initials_batch</span><span class="o">.</span><span class="n">dtype</span><span class="p">),</span>
                     <span class="n">ftol</span> <span class="o">=</span> <span class="mf">1e-8</span><span class="p">,</span>
                     <span class="n">ptol</span> <span class="o">=</span> <span class="mf">1e-8</span><span class="p">,</span>
                     <span class="n">gtol</span> <span class="o">=</span> <span class="mf">1e-8</span><span class="p">,</span>
-                    <span class="n">l</span> <span class="o">=</span> <span class="mf">.1</span><span class="p">,</span>
+                    <span class="n">l</span> <span class="o">=</span> <span class="mf">1.</span><span class="p">,</span>
                     <span class="n">max_iter</span> <span class="o">=</span> <span class="mi">80</span><span class="p">,</span>
                 <span class="p">)</span>
 
-<span class="c1"># parallel levenberg-marquardt for batch-optimization at multiple costs</span>
+<span class="c1"># parallel levenberg-marquardt for several optimization problems at multiple costs</span>
 <span class="kn">from</span> <span class="nn">torchimize.functions</span> <span class="kn">import</span> <span class="n">lsq_lma_parallel</span>
 <span class="n">coeffs_list</span> <span class="o">=</span> <span class="n">lsq_lma_parallel</span><span class="p">(</span>
                     <span class="n">p</span> <span class="o">=</span> <span class="n">initials_batch</span><span class="p">,</span>
                     <span class="n">function</span> <span class="o">=</span> <span class="n">multi_cost_fun_batch</span><span class="p">,</span>
                     <span class="n">jac_function</span> <span class="o">=</span> <span class="n">multi_jac_fun_batch</span><span class="p">,</span>
                     <span class="n">args</span> <span class="o">=</span> <span class="p">(</span><span class="n">other_args</span><span class="p">,),</span>
-                    <span class="n">wvec</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="mi">5</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="s1">&#39;cuda&#39;</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">float64</span><span class="p">),</span>
+                    <span class="n">wvec</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="mi">5</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="s1">&#39;cuda&#39;</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">initials_batch</span><span class="o">.</span><span class="n">dtype</span><span class="p">),</span>
                     <span class="n">ftol</span> <span class="o">=</span> <span class="mf">1e-8</span><span class="p">,</span>
                     <span class="n">ptol</span> <span class="o">=</span> <span class="mf">1e-8</span><span class="p">,</span>
                     <span class="n">gtol</span> <span class="o">=</span> <span class="mf">1e-8</span><span class="p">,</span>
-                    <span class="n">meth</span> <span class="o">=</span> <span class="s1">&#39;lev&#39;</span><span class="p">,</span>
+                    <span class="n">meth</span> <span class="o">=</span> <span class="s1">&#39;marq&#39;</span><span class="p">,</span>
                     <span class="n">max_iter</span> <span class="o">=</span> <span class="mi">40</span><span class="p">,</span>
                 <span class="p">)</span>
+
+<span class="c1"># validate that your provided functions return correct tensor dimensionality</span>
+<span class="kn">from</span> <span class="nn">torchimize.functions</span> <span class="kn">import</span> <span class="n">test_fun_dims_parallel</span>
+<span class="n">ret</span> <span class="o">=</span> <span class="n">test_fun_dims_parallel</span><span class="p">(</span>
+    <span class="n">p</span> <span class="o">=</span> <span class="n">initials_batch</span><span class="p">,</span>
+    <span class="n">function</span> <span class="o">=</span> <span class="n">multi_cost_fun_batch</span><span class="p">,</span>
+    <span class="n">jac_function</span> <span class="o">=</span> <span class="n">multi_jac_fun_batch</span><span class="p">,</span>
+    <span class="n">args</span> <span class="o">=</span> <span class="p">(</span><span class="n">other_args</span><span class="p">,),</span>
+    <span class="n">wvec</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="mi">5</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="s1">&#39;cuda&#39;</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">initials_batch</span><span class="o">.</span><span class="n">dtype</span><span class="p">),</span>
+<span class="p">)</span>
 </pre></div>
 </div>
 <div class="admonition note">

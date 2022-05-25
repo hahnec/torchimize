@@ -27,35 +27,45 @@ Kick-Start
     from torchimize.functions import lsq_lma
     coeffs_list = lsq_lma(initials, function=cost_fun, jac_function=jac_fun, args=(other_args,))
 
-    # parallel gauss-newton for batch-optimization at multiple costs
+    # parallel gauss-newton for several optimization problems at multiple costs
     from torchimize.functions import lsq_gna_parallel
     coeffs_list = lsq_gna_parallel(
                         p = initials_batch,
                         function = multi_cost_fun_batch,
                         jac_function = multi_jac_fun_batch,
                         args = (other_args,),
-                        wvec = torch.ones(5, device='cuda', dtype=torch.float64),
+                        wvec = torch.ones(5, device='cuda', dtype=initials_batch.dtype),
                         ftol = 1e-8,
                         ptol = 1e-8,
                         gtol = 1e-8,
-                        l = .1,
+                        l = 1.,
                         max_iter = 80,
                     )
 
-    # parallel levenberg-marquardt for batch-optimization at multiple costs
+    # parallel levenberg-marquardt for several optimization problems at multiple costs
     from torchimize.functions import lsq_lma_parallel
     coeffs_list = lsq_lma_parallel(
                         p = initials_batch,
                         function = multi_cost_fun_batch,
                         jac_function = multi_jac_fun_batch,
                         args = (other_args,),
-                        wvec = torch.ones(5, device='cuda', dtype=torch.float64),
+                        wvec = torch.ones(5, device='cuda', dtype=initials_batch.dtype),
                         ftol = 1e-8,
                         ptol = 1e-8,
                         gtol = 1e-8,
-                        meth = 'lev',
+                        meth = 'marq',
                         max_iter = 40,
                     )
+
+    # validate that your provided functions return correct tensor dimensionality
+    from torchimize.functions import test_fun_dims_parallel
+    ret = test_fun_dims_parallel(
+        p = initials_batch,
+        function = multi_cost_fun_batch,
+        jac_function = multi_jac_fun_batch,
+        args = (other_args,),
+        wvec = torch.ones(5, device='cuda', dtype=initials_batch.dtype),
+    )
 
 .. note::
     For simultaneous minimization of ``B`` optimization problems at a multiple of ``C`` costs, the ``function`` and ``jac_function`` arguments require to return a torch.Tensor type of ``B x C x N`` and ``B x C x N x P``, respectively. Here, ``N`` is the residual dimension and ``P`` represents the sought parameter number in each ``B x C``.
