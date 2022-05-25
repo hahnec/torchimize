@@ -92,7 +92,8 @@ def lsq_lma_parallel(
         # levenberg-marquardt step
         p, f, g, H = newton_2nd_order_step(p, fun, jac_fun, wvec)
         D = lm_dg_step(H, D)
-        h = -torch.linalg.lstsq(H+u[:, None, None]*D, g, rcond=None, driver=None)[0]
+        Hu = H+u[:, None, None]*D
+        h = -torch.linalg.lstsq(Hu.double(), g.double(), rcond=None, driver=None)[0].to(dtype=p.dtype)
         f_h = fun(p+h)
         rho_nom = torch.einsum('bcp,bci->bc', f, f).sum(1) - torch.einsum('bcp,bci->bc', f_h, f_h).sum(1)
         rho_denom = torch.einsum('bnp,bni->bi', h[..., None], (u[:, None]*h-g)[..., None])[..., 0]

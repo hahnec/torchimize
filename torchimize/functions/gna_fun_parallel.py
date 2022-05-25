@@ -171,7 +171,7 @@ def gauss_newton_step(
     Hc = torch.einsum('bcnp,bcni->bcpi', j, j)
     g = torch.einsum('bcp,c->bp', gc, wvec)
     H = torch.einsum('bcpi,c->bpi', Hc, wvec)
-    h = -l*torch.linalg.lstsq(H, g, rcond=None, driver=None)[0]
+    h = -l*torch.linalg.lstsq(H.double(), g.double(), rcond=None, driver=None)[0].to(dtype=p.dtype)
     p += h
     
     return p, f, g, h
