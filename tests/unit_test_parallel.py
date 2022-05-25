@@ -119,67 +119,74 @@ class ParallelOptimizationTest(unittest.TestCase):
 
     def test_gna_emg_conditions(self):
 
-        coeffs = lsq_gna_parallel(
-            p = self.batch_initials,
-            function = self.multi_cost_batch,
-            jac_function = self.multi_jaco_batch,
-            args = (self.t, self.batch_data_channels),
-            wvec = torch.ones(2, device=self.device, dtype=torch.float64, requires_grad=False),
-            l = .1,
-            gtol = 1e-6,
-            max_iter = 199,
-        )
+        for p in [self.batch_initials.float(), self.batch_initials.double()]:
 
-        # assertion
-        ret_params = torch.allclose(coeffs[-1], self.gt_params, atol=1e-1)
-        self.assertTrue(ret_params, 'Coefficients deviate')
-        eps = torch.sum(self.cost_batch(coeffs[-1], t=self.t, y=self.batch_data_channels))
-        self.assertTrue(eps.cpu()/len(self.gt_params) < 1, 'Error exceeded 1')
-        self.assertTrue(len(coeffs) < 200, 'Number of iterations exceeded 200')
+            coeffs = lsq_gna_parallel(
+                p = p,
+                function = self.multi_cost_batch,
+                jac_function = self.multi_jaco_batch,
+                args = (self.t.to(dtype=p.dtype), self.batch_data_channels.to(dtype=p.dtype)),
+                wvec = torch.ones(2, device=self.device, dtype=p.dtype, requires_grad=False),
+                l = .1,
+                gtol = 1e-6,
+                max_iter = 199,
+            )
+
+            # assertion
+            ret_params = torch.allclose(coeffs[-1].double(), self.gt_params, atol=1e-1)
+            self.assertTrue(ret_params, 'Coefficients deviate')
+            eps = torch.sum(self.cost_batch(coeffs[-1].double(), t=self.t, y=self.batch_data_channels))
+            self.assertTrue(eps.cpu()/len(self.gt_params) < 1, 'Error exceeded 1')
+            self.assertTrue(len(coeffs) < 200, 'Number of iterations exceeded 200')
 
     def test_gna_emg_plain(self):
 
-        multi_cost_batch_args = lambda p, t=self.t, y=self.batch_data_channels: self.multi_cost_batch(p_batch=p, t=t, y=y)
-        multi_jaco_batch_args = lambda p, t=self.t, y=self.batch_data_channels: self.multi_jaco_batch(p_batch=p, t=t, data=y)
 
-        coeffs = lsq_gna_parallel_plain(
-            p = self.batch_initials,
-            function = multi_cost_batch_args,
-            jac_function = multi_jaco_batch_args,
-            wvec = torch.ones(2, device=self.device, dtype=torch.float64, requires_grad=False),
-            l = .1,
-            max_iter = 199,
-        )
+        for p in [self.batch_initials.float(), self.batch_initials.double()]:
 
-        # assertion
-        ret_params = torch.allclose(coeffs, self.gt_params, atol=1e-1)
-        self.assertTrue(ret_params, 'Coefficients deviate')
-        eps = torch.sum(multi_cost_batch_args(coeffs))
-        self.assertTrue(eps.cpu()/len(self.gt_params) < 1, 'Error exceeded 1')
-        self.assertTrue(len(coeffs) < 200, 'Number of iterations exceeded 200')
+            multi_cost_batch_args = lambda p: self.multi_cost_batch(p_batch=p, t=self.t.to(dtype=p.dtype), y=self.batch_data_channels.to(dtype=p.dtype))
+            multi_jaco_batch_args = lambda p: self.multi_jaco_batch(p_batch=p, t=self.t.to(dtype=p.dtype), data=self.batch_data_channels.to(dtype=p.dtype))
+            
+            coeffs = lsq_gna_parallel_plain(
+                p = p,
+                function = multi_cost_batch_args,
+                jac_function = multi_jaco_batch_args,
+                wvec = torch.ones(2, device=self.device, dtype=p.dtype, requires_grad=False),
+                l = .1,
+                max_iter = 199,
+            )
+
+            # assertion
+            ret_params = torch.allclose(coeffs.double(), self.gt_params, atol=1e-1)
+            self.assertTrue(ret_params, 'Coefficients deviate')
+            eps = torch.sum(multi_cost_batch_args(coeffs.double()))
+            self.assertTrue(eps.cpu()/len(self.gt_params) < 1, 'Error exceeded 1')
+            self.assertTrue(len(coeffs) < 200, 'Number of iterations exceeded 200')
 
     def test_lma_emg_conditions(self):
 
         from torchimize.functions.lma_fun_parallel import lsq_lma_parallel
 
-        for m in ['lev', 'marq']:
+        for p in [self.batch_initials.float(), self.batch_initials.double()]:
+            
+            for m in ['lev', 'marq']:
 
-            coeffs = lsq_lma_parallel(
-                self.batch_initials,
-                function = self.multi_cost_batch,
-                jac_function = self.multi_jaco_batch,
-                args = (self.t, self.batch_data_channels),
-                wvec = torch.ones(2, device=self.device, dtype=torch.float64, requires_grad=False),
-                meth = m,
-                max_iter = 199,
-            )
+                coeffs = lsq_lma_parallel(
+                    p = p,
+                    function = self.multi_cost_batch,
+                    jac_function = self.multi_jaco_batch,
+                    args = (self.t.to(dtype=p.dtype), self.batch_data_channels.to(dtype=p.dtype)),
+                    wvec = torch.ones(2, device=self.device, dtype=p.dtype, requires_grad=False),
+                    meth = m,
+                    max_iter = 199,
+                )
 
-            # assertion
-            ret_params = torch.allclose(coeffs[-1], self.gt_params, atol=1e-1)
-            self.assertTrue(ret_params, 'Coefficients deviate')
-            eps = torch.sum(self.cost_batch(coeffs[-1], t=self.t, y=self.batch_data_channels))
-            self.assertTrue(eps.cpu()/len(self.gt_params) < 1, 'Error exceeded 1')
-            self.assertTrue(len(coeffs) < 40, 'Number of iterations exceeded 40')
+                # assertion
+                ret_params = torch.allclose(coeffs[-1].double(), self.gt_params, atol=1e-1)
+                self.assertTrue(ret_params, 'Coefficients deviate')
+                eps = torch.sum(self.cost_batch(coeffs[-1].double(), t=self.t, y=self.batch_data_channels))
+                self.assertTrue(eps.cpu()/len(self.gt_params) < 1, 'Error exceeded 1')
+                self.assertTrue(len(coeffs) < 40, 'Number of iterations exceeded 40')
 
     def test_all(self):
 
