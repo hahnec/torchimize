@@ -188,8 +188,25 @@ class ParallelOptimizationTest(unittest.TestCase):
                 self.assertTrue(eps.cpu()/len(self.gt_params) < 1, 'Error exceeded 1')
                 self.assertTrue(len(coeffs) < 40, 'Number of iterations exceeded 40')
 
-    def test_all(self):
+    def test_fun_dims(self):
 
+        from torchimize.functions import test_fun_dims_parallel
+
+        for p in [self.batch_initials.float(), self.batch_initials.double()]:
+
+            ret = test_fun_dims_parallel(
+                p = p,
+                function = self.multi_cost_batch,
+                jac_function = self.multi_jaco_batch,
+                args = (self.t.to(dtype=p.dtype), self.batch_data_channels.to(dtype=p.dtype)),
+                wvec = torch.ones(2, device=self.device, dtype=p.dtype, requires_grad=False),
+            )
+
+            self.assertTrue(ret, 'torch tensor dimensionality test failed')
+
+    def test_all(self):
+        
+        self.test_fun_dims()
         self.test_lma_emg_conditions()
         self.test_gna_emg_conditions()
         self.test_gna_emg_plain()
