@@ -18,6 +18,7 @@ import torch
 from typing import Union, Callable, List, Tuple
 
 from torchimize.functions.jacobian import jacobian_approx_t
+from torchimize.functions.newton_parallel import newton_2nd_order_step
 
 
 def lsq_lma_parallel(
@@ -144,30 +145,3 @@ def marquardt_uv(
     u[rho > rho2] /= gama
 
     return u, v
-
-
-def newton_2nd_order_step(        
-        p: torch.Tensor,
-        function: Callable,
-        jac_function: Callable,
-        wvec: torch.Tensor,
-    ) -> Tuple[torch.Tensor, torch.Tensor, torch.Tensor, torch.Tensor]:
-
-    """
-    Newton second order step function for parallel least-squares fitting of non-linear functions
-
-    :param p: current guess
-    :param function: user-provided function which takes p (and additional arguments) as input
-    :param jac_fun: user-provided Jacobian function which takes p (and additional arguments) as input
-    :param wvec: weights vector used in reduction of multiple costs
-    :return: list of results
-    """
-
-    f = function(p)
-    j = jac_function(p)
-    gc = torch.einsum('bcnp,bcnp->bcp', j, f[..., None])
-    Hc = torch.einsum('bcnp,bcni->bcpi', j, j)
-    g = torch.einsum('bcp,c->bp', gc, wvec)
-    H = torch.einsum('bcpi,c->bpi', Hc, wvec)
-
-    return p, f, g, H

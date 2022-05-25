@@ -18,6 +18,7 @@ import torch
 from typing import Union, Callable, Tuple, List
 
 from torchimize.functions.jacobian import jacobian_approx_t
+from torchimize.functions.newton_parallel import newton_2nd_order_step
 
 
 def lsq_gna_parallel(
@@ -165,13 +166,8 @@ def gauss_newton_step(
     :return: list of results
     """
 
-    f = function(p)
-    j = jac_function(p)
-    gc = torch.einsum('bcnp,bcnp->bcp', j, f[..., None])
-    Hc = torch.einsum('bcnp,bcni->bcpi', j, j)
-    g = torch.einsum('bcp,c->bp', gc, wvec)
-    H = torch.einsum('bcpi,c->bpi', Hc, wvec)
-    h = -l*torch.linalg.lstsq(H.double(), g.double(), rcond=None, driver=None)[0].to(dtype=p.dtype)
-    p += h
-    
+    p, f, g, H = newton_2nd_order_step(p, function, jac_function, wvec)
+    h = torch.linalg.lstsq(H.double(), g.double(), rcond=None, driver=None)[0].to(dtype=p.dtype)
+    p -= l*h
+
     return p, f, g, h
