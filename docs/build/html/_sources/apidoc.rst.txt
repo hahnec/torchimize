@@ -14,6 +14,8 @@ API documentation
 .. autofunction:: torchimize.functions.lsq_gna_parallel
 .. autofunction:: torchimize.functions.lsq_gna_parallel_plain
 .. autofunction:: torchimize.functions.lsq_lma_parallel
+.. autofunction:: torchimize.functions.newton_step_parallel
+.. autofunction:: torchimize.functions.test_fun_dims_parallel
 
 .. Indices and tables
 .. ==================
