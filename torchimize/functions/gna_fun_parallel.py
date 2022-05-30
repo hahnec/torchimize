@@ -16,6 +16,7 @@ __license__ = """
 
 import torch
 from typing import Union, Callable, Tuple, List
+import warnings
 
 from torchimize.functions.jacobian import jacobian_approx_t
 from torchimize.functions.newton_parallel import newton_step_parallel
@@ -66,8 +67,11 @@ def lsq_gna_parallel(
     p_list = []
     f_prev = torch.zeros(1, device=p.device, dtype=p.dtype)
     while len(p_list) < max_iter:
-        p, f, g, h = gauss_newton_step(p, fun, jac_fun, wvec, l)
+        p, f, g, h, H = gauss_newton_step(p, fun, jac_fun, wvec, l)
         p_list.append(p.clone())
+
+        if torch.linalg.cond(H).isinf().sum() > 0: 
+            warnings.warn('Condition number of at least one Hessian is infinite giving NaNs. Consider a step rate l<1.')
 
         # stop conditions
         gcon = torch.max(abs(g)) < gtol
@@ -129,4 +133,4 @@ def gauss_newton_step(
     h = torch.linalg.lstsq(H.double(), g.double(), rcond=None, driver=None)[0].to(dtype=p.dtype)
     p -= l*h
 
-    return p, f, g, h
+    return p, f, g, h, H
