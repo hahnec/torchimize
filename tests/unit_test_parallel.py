@@ -18,7 +18,7 @@ import unittest
 import torch
 
 from torchimize.functions import lsq_gna_parallel, lsq_gna_parallel_plain
-from tests.emg_mm import *
+from tests.emg import *
 
 class ParallelOptimizationTest(unittest.TestCase):
 
@@ -197,6 +197,27 @@ class ParallelOptimizationTest(unittest.TestCase):
                 self.eps_lma_cond = torch.round(eps, decimals=4)
                 self.assertTrue(self.eps_lma_cond/len(self.gt_params) < 1, 'Error exceeded 1')
 
+    def scipy_fit(self):
+
+        from scipy.optimize import least_squares
+        
+        i = 0
+        p = self.batch_initials[i, ...].clone().float().cpu()
+        t = self.t.clone().cpu()
+        data = self.batch_data_channels[i, ...].to(dtype=p.dtype).cpu()
+
+        emg_model_args = lambda p: self.emg_model(p, t=t)
+        emg_jacob_args = lambda p: self.emg_jac(p, t=t, data=data)
+
+        coeffs = least_squares(
+                fun = emg_model_args,
+                x0 = p,
+                jac = emg_jacob_args,
+                method = 'lm',
+            ).x
+
+        return coeffs
+
     def test_fun_dims(self):
 
         from torchimize.functions import test_fun_dims_parallel
@@ -214,7 +235,7 @@ class ParallelOptimizationTest(unittest.TestCase):
             self.assertTrue(ret, 'torch tensor dimensionality test failed')
 
     def test_all(self):
-        
+
         self.test_fun_dims()
         self.test_gna_emg_plain()
         self.test_gna_emg_conditions()

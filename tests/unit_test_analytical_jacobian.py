@@ -19,7 +19,7 @@ import torch
 
 from torchimize.functions.lma_fun import lsq_lma
 from torchimize.functions.gna_fun import lsq_gna
-from tests.emg_mm import *
+from tests.emg import *
 
 class JacobianFunctionTest(unittest.TestCase):
 
