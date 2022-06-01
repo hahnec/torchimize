@@ -45,7 +45,7 @@ def lsq_gna_parallel(
     :param ftol: relative change in cost function as stop condition
     :param ptol: relative change in independant variables as stop condition
     :param gtol: maximum gradient tolerance as stop condition
-    :param l: learning rate
+    :param l: step size damping parameter
     :param max_iter: maximum number of iterations
     :return: list of results
     """
@@ -100,7 +100,7 @@ def lsq_gna_parallel_plain(
     :param function: user-provided function which takes p (and additional arguments) as input
     :param jac_fun: user-provided Jacobian function which takes p (and additional arguments) as input
     :param wvec: weights vector used in reduction of multiple costs
-    :param l: learning rate
+    :param l: step size damping parameter
     :param max_iter: maximum number of iterations
     :return: result
     """
@@ -125,7 +125,7 @@ def gauss_newton_step(
     :param function: user-provided function which takes p (and additional arguments) as input
     :param jac_fun: user-provided Jacobian function which takes p (and additional arguments) as input
     :param wvec: weights vector used in reduction of multiple costs
-    :param l: learning rate
+    :param l: step size damping parameter
     :return: list of results
     """
 

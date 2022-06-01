@@ -41,7 +41,7 @@ def lsq_gna(
     :param ftol: relative change in cost function as stop condition
     :param ptol: relative change in independant variables as stop condition
     :param gtol: maximum gradient tolerance as stop condition
-    :param l: learning rate
+    :param l: step size damping parameter
     :param max_iter: maximum number of iterations
     :return: list of results
     """
