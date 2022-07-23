@@ -1,19 +1,3 @@
-__author__ = "Christopher Hahne"
-__email__ = "inbox@christopherhahne.de"
-__license__ = """
-    Copyright (c) 2022 Christopher Hahne <inbox@christopherhahne.de>
-    This program is free software: you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation, either version 3 of the License, or
-    (at your option) any later version.
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
-    You should have received a copy of the GNU General Public License
-    along with this program. If not, see <http://www.gnu.org/licenses/>.
-"""
-
 import torch
 from torch import Tensor
 import torch.nn as nn
@@ -26,7 +10,7 @@ class GNA(Optimizer):
     r"""Implements Gauss-Newton.
     """
 
-    def __init__(self, params, lr: float, model: nn.Module):
+    def __init__(self, params, lr: float, model: nn.Module, hessian_approx: bool = True):
 
         if lr is not None and lr < 0.0:
             raise ValueError("Invalid learning rate: {}".format(lr))
@@ -35,9 +19,10 @@ class GNA(Optimizer):
 
         super(GNA, self).__init__(params, defaults)
 
+        self.hessian_approx = hessian_approx
+
         self._model = model
         self._params = self.param_groups[0]['params']
-        self._modules = [m for m in model.modules()][1:]
         self._j_list = []
         self._h_list = []
 
@@ -52,6 +37,7 @@ class GNA(Optimizer):
         """Performs a single optimization step.
 
         Args:
+            x: Current data batch, which is needed to compute 2nd order derivatives
             closure (callable, optional): A closure that reevaluates the model
                 and returns the loss.
         """
@@ -73,19 +59,27 @@ class GNA(Optimizer):
             parameters = dict(self._model.named_parameters())
             keys, values = zip(*parameters.items())
 
-            # vectorized jacobian (https://github.com/pytorch/pytorch/issues/49171)
-            def func(*params: torch.Tensor):
-                out = _stateless.functional_call(self._model, {n: p for n, p in zip(keys, params)}, x)
-                return out
-            self._j_list: tuple[torch.Tensor] = torch.autograd.functional.jacobian(func, values, create_graph=True)
-            self._j_list = [j.squeeze(1).flatten(start_dim=1) for j in self._j_list] # remove hidden and predict bias dimensions
-
-            # vectorized hessian (https://github.com/pytorch/pytorch/issues/49171)
-            def loss(*params):
-                out: torch.Tensor = _stateless.functional_call(self._model, {n: p for n, p in zip(keys, params)}, x)
-                return out.square().sum()
-            self._h_list: tuple[torch.Tensor] = torch.autograd.functional.hessian(loss, tuple(self._model.parameters()), create_graph=True)
-            #self._h_list = [torch.squeeze(h) for i, h in enumerate(self._h_list)] # filter hessian and remove hidden and predict bias dimensions
+            self._h_list = []
+            if self.hessian_approx:
+                # vectorized jacobian (https://github.com/pytorch/pytorch/issues/49171)
+                def func(*params: torch.Tensor):
+                    out = _stateless.functional_call(self._model, {n: p for n, p in zip(keys, params)}, x)
+                    return out
+                self._j_list: tuple[torch.Tensor] = torch.autograd.functional.jacobian(func, values, create_graph=False)    # NxCxBxCxHxW
+                # create hessian approximation
+                for i, j in enumerate(self._j_list):
+                    j = j.flatten(end_dim=len(self._j_list[i].shape)-len(d_p_list[i].shape)-1).flatten(start_dim=1)  # (NC)x(BCHW)
+                    h = j.T.matmul(j)
+                    self._h_list.append(h)
+                
+            else:
+                # vectorized hessian (https://github.com/pytorch/pytorch/issues/49171)
+                def func(*params: torch.Tensor):
+                    out: torch.Tensor = _stateless.functional_call(self._model, {n: p for n, p in zip(keys, params)}, x)
+                    return out.square().sum()
+                self._h_list: tuple[torch.Tensor] = torch.autograd.functional.hessian(func, tuple(self._model.parameters()), create_graph=False)
+                self._h_list = [self._h_list[i][i] for i in range(len(self._h_list))] # filter j-th element
+                self._h_list = [h.flatten(end_dim=len(self._h_list[i].shape)-len(d_p_list[i].shape)-1).flatten(start_dim=1) for i, h in enumerate(self._h_list)] # (NC)x(BCHW)
 
             self.gna_update(
                 params_with_grad,
@@ -104,18 +98,20 @@ class GNA(Optimizer):
         r"""Functional API that performs Gauss-Newton algorithm computation.
 
         """
-        # 4 list elements in raw_train_fit.py for hidden and predict weights and biases
+
+        assert len(d_p_list) == len(self._h_list), 'Layer number mismatch'
+
+        # e.g. 4 list elements in raw_train_fit.py for hidden and predict weights and biases
         for i, param in enumerate(params):
 
             d_p = d_p_list[i]
-            j = self._j_list[i]
-            h = j.T.matmul(j)
-            #h = self._h_list[i][i]
-            h = h + torch.eye(j.shape[1])*torch.finfo(h.dtype).eps      # prevent zeros along hessian diagonal
-            h_i = h.inverse()
-            if h.shape[-1] == d_p.shape[0]:
-                param.add_(h_i.matmul(d_p), alpha=-lr)
-            elif h.shape[-1] == d_p.shape[::-1][0]:
-                param.add_(h_i.matmul(d_p.T).T, alpha=-lr)
+            h = self._h_list[i]    
+            # prevent zeros along Hessian diagonal
+            diag_vec = h.diagonal() + torch.finfo(h.dtype).eps * 1
+            h.as_strided([h.size(0)], [h.size(0) + 1]).copy_(diag_vec)
+            h_i = h.pinverse()
+            if h_i.shape[-1] == d_p.flatten().shape[0]:
+                d2_p = h_i.matmul(d_p.flatten()).reshape(d_p_list[i].shape)
+                param.add_(d2_p, alpha=-lr)
             else:
                 raise Exception('Tensor dimension mismatch')
