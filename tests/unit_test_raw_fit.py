@@ -70,15 +70,20 @@ class TorchimizerTest(unittest.TestCase):
 
         self.net = Net()
 
-        self.opt = torch.optim.LBFGS(self.net.parameters(), lr=self.LR)
-        self.opt = torch.optim.Adam(self.net.parameters(), lr=self.LR)
-        self.opt = torch.optim.SGD(self.net.parameters(), lr=self.LR)
-
         self.loss_func = nn.MSELoss()
-    
-    def test_gna_optimizer(self):
 
         self.opt = GNA(self.net.parameters(), lr=self.LR, model=self.net)
+
+    def test_optimizer(self):
+        
+        # for LBFGS usage
+        def closure():
+            pre = self.net(b_x)
+            loss = self.loss_func(pre, b_y)
+            self.opt.zero_grad()
+            loss.backward()
+
+            return loss
 
         all_loss = {}
         for epoch in range(self.EPOCH):
@@ -88,10 +93,15 @@ class TorchimizerTest(unittest.TestCase):
                 loss = self.loss_func(pre, b_y)
                 self.opt.zero_grad()
                 loss.backward()
-                try:
+
+                # parameter update step based on optimizer
+                if str(self.opt).__contains__('GNA'):
                     self.opt.step(b_x)
-                except torch._C._LinAlgError:
-                    pass
+                elif str(self.opt).__contains__('LBFGS'):
+                    self.opt.step(closure=closure)
+                else:
+                    self.opt.step()
+
                 all_loss[epoch+1] = loss
                 print('batch: {}, loss: {}'.format(batch_idx, loss.detach().numpy().item()))
 
@@ -110,10 +120,38 @@ class TorchimizerTest(unittest.TestCase):
             plt.scatter(self.X_test.numpy(), predict, color='red', label='predict')
             plt.legend()
             plt.show()
+    
+    def gna_optimizer(self):
+
+        for hessian_method in range(0, 1):
+            self.opt = GNA(self.net.parameters(), lr=self.LR, model=self.net, hessian_approx=bool(hessian_method))
+            self.test_optimizer()
+
+    def adam_optimizer(self):
+        
+        self.opt = torch.optim.Adam(self.net.parameters(), lr=self.LR)
+        self.test_optimizer()
+
+    def sgd_optimizer(self):
+
+        self.opt = torch.optim.SGD(self.net.parameters(), lr=self.LR)
+        self.test_optimizer()
+
+    def lbfgs_optimizer(self):
+
+        self.opt = torch.optim.LBFGS(self.net.parameters(), lr=self.LR)
+        self.test_optimizer()
 
 
     def test_all(self):
-        self.test_gna_optimizer()
+        print('\nGNA optimizer test')
+        self.gna_optimizer()
+        print('\nSGD optimizer test (for comparison)')
+        self.sgd_optimizer()
+        print('\nADAM optimizer test (for comparison)')
+        self.adam_optimizer()
+        print('\nLBFGS optimizer test (for comparison)')
+        self.lbfgs_optimizer()
 
 
 if __name__ == '__main__':
