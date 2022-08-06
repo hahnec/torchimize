@@ -64,6 +64,8 @@ def lsq_gna_parallel(
 
     assert len(p.shape) == 2, 'parameter tensor is supposed to have 2 dims, but has %s' % str(len(p.shape))
 
+    wvec = torch.ones(1, device=p.device, dtype=p.dtype) if wvec is None else wvec
+
     p_list = []
     f_prev = torch.zeros(1, device=p.device, dtype=p.dtype)
     while len(p_list) < max_iter:

@@ -73,6 +73,7 @@ def lsq_lma_parallel(
     
     assert len(p.shape) == 2, 'parameter tensor is supposed to have 2 dims, but has %s' % str(len(p.shape))
 
+    wvec = torch.ones(1, device=p.device, dtype=p.dtype) if wvec is None else wvec
     D = torch.eye(p.shape[-1], dtype=p.dtype, device=p.device)[None, ...].repeat(p.shape[0], 1, 1)
     u = tau * torch.max(torch.diagonal(D, dim1=-2, dim2=-1), 1)[0]
     sinf = torch.tensor([-torch.inf, torch.inf], dtype=p.dtype, device=p.device)
