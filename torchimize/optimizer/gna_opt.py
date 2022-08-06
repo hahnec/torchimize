@@ -69,7 +69,10 @@ class GNA(Optimizer):
                 # create hessian approximation
                 for i, j in enumerate(self._j_list):
                     j = j.flatten(end_dim=len(self._j_list[i].shape)-len(d_p_list[i].shape)-1).flatten(start_dim=1)  # (NC)x(BCHW)
-                    h = j.T.matmul(j)
+                    try:
+                        h = j.T.matmul(j)
+                    except RuntimeError:
+                        h = None
                     self._h_list.append(h)
                 
             else:
@@ -105,7 +108,11 @@ class GNA(Optimizer):
         for i, param in enumerate(params):
 
             d_p = d_p_list[i]
-            h = self._h_list[i]    
+            h = self._h_list[i]
+            if h is None:
+                # fall back to stochastic gradient descent
+                param.add_(d_p, alpha=-lr)
+                break
             # prevent zeros along Hessian diagonal
             diag_vec = h.diagonal() + torch.finfo(h.dtype).eps * 1
             h.as_strided([h.size(0)], [h.size(0) + 1]).copy_(diag_vec)
