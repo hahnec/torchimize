@@ -10,7 +10,7 @@
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>1. Description &mdash; torchimize 0.0.2 documentation</title>
+  <title>1. Description &mdash; torchimize 0.0.10 documentation</title>
   
 
   
@@ -198,7 +198,7 @@
               
               
                 <div class="version">
-                  0.0.2
+                  0.0.10
                 </div>
               
             
@@ -316,6 +316,8 @@
 </section>
 <section id="kick-start">
 <h1><span class="section-number">3. </span>Kick-Start<a class="headerlink" href="#kick-start" title="Permalink to this headline">¶</a></h1>
+<section id="cost-optimization">
+<h2><span class="section-number">3.1. </span>Cost Optimization<a class="headerlink" href="#cost-optimization" title="Permalink to this headline">¶</a></h2>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># single gauss-newton</span>
 <span class="kn">from</span> <span class="nn">torchimize.functions</span> <span class="kn">import</span> <span class="n">lsq_gna</span>
 <span class="n">coeffs_list</span> <span class="o">=</span> <span class="n">lsq_gna</span><span class="p">(</span><span class="n">initials</span><span class="p">,</span> <span class="n">cost_fun</span><span class="p">,</span> <span class="n">args</span><span class="o">=</span><span class="p">(</span><span class="n">other_args</span><span class="p">,))</span>
@@ -370,6 +372,7 @@
 <p>For simultaneous minimization of <code class="docutils literal notranslate"><span class="pre">B</span></code> optimization problems at a multiple of <code class="docutils literal notranslate"><span class="pre">C</span></code> costs, the <code class="docutils literal notranslate"><span class="pre">function</span></code> and <code class="docutils literal notranslate"><span class="pre">jac_function</span></code> arguments require to return a torch.Tensor type of <code class="docutils literal notranslate"><span class="pre">B</span> <span class="pre">x</span> <span class="pre">C</span> <span class="pre">x</span> <span class="pre">N</span></code> and <code class="docutils literal notranslate"><span class="pre">B</span> <span class="pre">x</span> <span class="pre">C</span> <span class="pre">x</span> <span class="pre">N</span> <span class="pre">x</span> <span class="pre">P</span></code>, respectively. Here, <code class="docutils literal notranslate"><span class="pre">N</span></code> is the residual dimension and <code class="docutils literal notranslate"><span class="pre">P</span></code> represents the sought parameter number in each <code class="docutils literal notranslate"><span class="pre">B</span> <span class="pre">x</span> <span class="pre">C</span></code>.</p>
 </aside>
 <p>For further details, see the <a class="reference external" href="https://hahnec.github.io/torchimize/build/html/apidoc.html"><strong>API documentation</strong></a>.</p>
+</section>
 </section>
 <section id="citation">
 <h1><span class="section-number">4. </span>Citation<a class="headerlink" href="#citation" title="Permalink to this headline">¶</a></h1>
@@ -430,7 +433,10 @@
               <ul>
 <li><a class="reference internal" href="#">1. Description</a></li>
 <li><a class="reference internal" href="#installation">2. Installation</a></li>
-<li><a class="reference internal" href="#kick-start">3. Kick-Start</a></li>
+<li><a class="reference internal" href="#kick-start">3. Kick-Start</a><ul>
+<li><a class="reference internal" href="#cost-optimization">3.1. Cost Optimization</a></li>
+</ul>
+</li>
 <li><a class="reference internal" href="#citation">4. Citation</a></li>
 </ul>
 
