@@ -78,7 +78,7 @@ For further details, see the |apidoc|_.
 Optimizer for Neural Nets
 -------------------------
 
-For 2nd-order neural network training, one may use ``GNA`` class as demonstrated below. Note that this requires more memory (e.g., than ``SGD``) and is still for experimental usage.
+For 2nd-order neural network training, one may use ``GNA`` class as demonstrated below. Note that this requires more memory than 1st-order methods and is for experimental usage.
 
 .. code-block:: python
 
