@@ -17,8 +17,8 @@ __license__ = """
 import unittest
 import torch
 
-from torchimize.functions.lma_fun import lsq_lma
-from torchimize.functions.gna_fun import lsq_gna
+from torchimize.functions.single.lma_fun_single import lsq_lma
+from torchimize.functions.single.gna_fun_single import lsq_gna
 from tests.emg import *
 
 class JacobianFunctionTest(unittest.TestCase):

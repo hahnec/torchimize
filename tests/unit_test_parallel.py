@@ -169,7 +169,7 @@ class ParallelOptimizationTest(unittest.TestCase):
 
     def test_lma_emg_conditions(self):
 
-        from torchimize.functions.lma_fun_parallel import lsq_lma_parallel
+        from torchimize.functions.parallel.lma_fun_parallel import lsq_lma_parallel
 
         for p in [self.batch_initials.clone().float(), self.batch_initials.clone().double()]:
             

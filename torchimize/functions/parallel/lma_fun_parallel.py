@@ -18,7 +18,7 @@ import torch
 from typing import Union, Callable, List, Tuple
 
 from torchimize.functions.jacobian import jacobian_approx_t
-from torchimize.functions.newton_parallel import newton_step_parallel
+from torchimize.functions.parallel.newton_parallel import newton_step_parallel
 
 
 def lsq_lma_parallel(
