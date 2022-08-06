@@ -17,6 +17,9 @@ Installation
 Kick-Start
 ==========
 
+Cost Optimization
+-----------------
+
 .. code-block:: python
 
     # single gauss-newton
@@ -72,6 +75,24 @@ Kick-Start
 
 For further details, see the |apidoc|_.
 
+Optimizer for Neural Nets
+-------------------------
+
+For 2nd-order neural network training, one may use ``GNA`` class as demonstrated below. Note that this requires more memory (e.g., than ``SGD``) and is still for experimental usage.
+
+.. code-block:: python
+
+    from torchimize.optimizer.gna_opt import GNA
+
+    self.opt = GNA(self.net.parameters(), lr=self.LR, model=self.net)
+
+    for epoch in range(EPOCHS):
+        for batch_idx, (b_x, b_y) in enumerate(self.loader):
+            pre = self.net(b_x)
+            loss = self.loss_func(pre, b_y)
+            self.opt.zero_grad()
+            loss.backward()
+            self.opt.step(b_x)
 
 .. substitutions
 
