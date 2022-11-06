@@ -9,8 +9,11 @@ API documentation
 
 .. automodule:: torchimize.functions
    :members:
+.. autofunction:: torchimize.functions.gradient_descent
 .. autofunction:: torchimize.functions.lsq_gna
 .. autofunction:: torchimize.functions.lsq_lma
+.. autofunction:: torchimize.functions.gradient_descent_parallel
+.. autofunction:: torchimize.functions.gradient_descent_parallel_plain
 .. autofunction:: torchimize.functions.lsq_gna_parallel
 .. autofunction:: torchimize.functions.lsq_gna_parallel_plain
 .. autofunction:: torchimize.functions.lsq_lma_parallel
