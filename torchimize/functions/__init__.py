@@ -1,5 +1,7 @@
+from torchimize.functions.single.gda_fun_single import gradient_descent
 from torchimize.functions.single.gna_fun_single import lsq_gna
 from torchimize.functions.single.lma_fun_single import lsq_lma
+from torchimize.functions.parallel.gda_fun_parallel import gradient_descent_parallel, gradient_descent_parallel_plain
 from torchimize.functions.parallel.gna_fun_parallel import lsq_gna_parallel, lsq_gna_parallel_plain
 from torchimize.functions.parallel.lma_fun_parallel import lsq_lma_parallel
 from torchimize.functions.parallel.newton_parallel import newton_step_parallel

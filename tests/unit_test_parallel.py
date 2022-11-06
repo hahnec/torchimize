@@ -143,7 +143,7 @@ class ParallelOptimizationTest(unittest.TestCase):
 
     def test_gradient_descent_emg_conditions(self):
 
-        from torchimize.functions.parallel.gradient_descent_parallel import gradient_descent_parallel
+        from torchimize.functions.parallel.gda_fun_parallel import gradient_descent_parallel
 
         for p in [self.batch_initials.clone().float(), self.batch_initials.clone().double()]:
 

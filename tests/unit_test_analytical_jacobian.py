@@ -19,7 +19,7 @@ import torch
 
 from torchimize.functions.single.lma_fun_single import lsq_lma
 from torchimize.functions.single.gna_fun_single import lsq_gna
-from torchimize.functions.single.gradient_descent_single import gradient_descent
+from torchimize.functions.single.gda_fun_single import gradient_descent
 from tests.emg import *
 
 class JacobianFunctionTest(unittest.TestCase):
