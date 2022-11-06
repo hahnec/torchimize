@@ -117,7 +117,7 @@ def newton_raphson_step(
         l: float = 1.,
     ) -> Tuple[torch.Tensor, torch.Tensor, torch.Tensor, torch.Tensor]:
     """
-    Gauss-Newton step function for parallel least-squares fitting of non-linear functions
+    Gradient Descent step function for parallel least-squares fitting of non-linear functions
 
     :param p: current guess
     :param function: user-provided function which takes p (and additional arguments) as input
