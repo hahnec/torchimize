@@ -19,6 +19,7 @@ import torch
 
 from torchimize.functions.single.lma_fun_single import lsq_lma
 from torchimize.functions.single.gna_fun_single import lsq_gna
+from torchimize.functions.single.gradient_descent_single import gradient_descent
 from tests.emg import *
 
 class JacobianFunctionTest(unittest.TestCase):
@@ -70,6 +71,17 @@ class JacobianFunctionTest(unittest.TestCase):
 
         return jacobian
 
+    def test_gd_emg(self):
+
+        coeffs = gradient_descent(self.initials, self.cost_fun, jac_function=self.emg_jac, args=(self.t, self.data_raw), l=.1, gtol=1e-6, max_iter=199)
+
+        # assertion
+        ret_params = torch.allclose(coeffs[-1], self.gt_params, atol=1e-1)
+        self.assertTrue(ret_params, 'Coefficients deviate')
+        eps = torch.sum(self.cost_fun(coeffs[-1], t=self.t, y=self.data_raw))
+        self.assertTrue(eps.cpu() < 1, 'Error exceeded')
+        self.assertTrue(len(coeffs) < 200, 'Number of iterations exceeded 200')
+
     def test_gna_emg(self):
 
         coeffs = lsq_gna(self.initials, self.cost_fun, jac_function=self.emg_jac, args=(self.t, self.data_raw), l=.1, gtol=1e-6, max_iter=199)
@@ -95,6 +107,7 @@ class JacobianFunctionTest(unittest.TestCase):
 
     def test_all(self):
 
+        self.test_gd_emg()
         self.test_gna_emg()
         self.test_lma_emg()
 
