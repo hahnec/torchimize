@@ -107,7 +107,7 @@ class TorchimizerTest(unittest.TestCase):
 
         try:
             torch.save(self.net.state_dict(), Path.cwd() / 'result' / 'raw_train_fit_model.pth')
-        except FileNotFoundError:
+        except (FileNotFoundError, RuntimeError):
             pass
         
         self.net.eval()
