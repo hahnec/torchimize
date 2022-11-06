@@ -28,9 +28,8 @@ jobs:
       matrix:
         os: [ubuntu-latest, windows-latest, macos-latest]
     steps:
-      - uses: actions/checkout@v2
-        with:
-          ref: develop
+      - name: Checkout
+        uses: actions/checkout@v2
       - name: Install Python 3
         uses: actions/setup-python@v1
         with:
