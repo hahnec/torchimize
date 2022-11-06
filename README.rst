@@ -22,6 +22,10 @@ Cost Optimization
 
 .. code-block:: python
 
+    # single gradient descent
+    from torchimize.functions.single.gda_fun_single import gradient_descent
+    coeffs_list = gradient_descent(initials, cost_fun, args=(other_args,))
+
     # single gauss-newton
     from torchimize.functions import lsq_gna
     coeffs_list = lsq_gna(initials, cost_fun, args=(other_args,))
@@ -29,6 +33,21 @@ Cost Optimization
     # single levenberg-marquardt
     from torchimize.functions import lsq_lma
     coeffs_list = lsq_lma(initials, function=cost_fun, jac_function=jac_fun, args=(other_args,))
+
+    # parallel gradient descent for several optimization problems at multiple costs
+    from torchimize.functions import gradient_descent_parallel
+    coeffs_list = gradient_descent_parallel(
+                        p = initials_batch,
+                        function = multi_cost_fun_batch,
+                        jac_function = multi_jac_fun_batch,
+                        args = (other_args,),
+                        wvec = torch.ones(5, device='cuda', dtype=initials_batch.dtype),
+                        ftol = 1e-8,
+                        ptol = 1e-8,
+                        gtol = 1e-8,
+                        l = 1.,
+                        max_iter = 80,
+                    )
 
     # parallel gauss-newton for several optimization problems at multiple costs
     from torchimize.functions import lsq_gna_parallel
