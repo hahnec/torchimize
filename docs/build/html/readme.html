@@ -318,13 +318,32 @@
 <h1><span class="section-number">3. </span>Kick-Start<a class="headerlink" href="#kick-start" title="Permalink to this headline">¶</a></h1>
 <section id="cost-optimization">
 <h2><span class="section-number">3.1. </span>Cost Optimization<a class="headerlink" href="#cost-optimization" title="Permalink to this headline">¶</a></h2>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># single gauss-newton</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># single gradient descent</span>
+<span class="kn">from</span> <span class="nn">torchimize.functions.single.gda_fun_single</span> <span class="kn">import</span> <span class="n">gradient_descent</span>
+<span class="n">coeffs_list</span> <span class="o">=</span> <span class="n">gradient_descent</span><span class="p">(</span><span class="n">initials</span><span class="p">,</span> <span class="n">cost_fun</span><span class="p">,</span> <span class="n">args</span><span class="o">=</span><span class="p">(</span><span class="n">other_args</span><span class="p">,))</span>
+
+<span class="c1"># single gauss-newton</span>
 <span class="kn">from</span> <span class="nn">torchimize.functions</span> <span class="kn">import</span> <span class="n">lsq_gna</span>
 <span class="n">coeffs_list</span> <span class="o">=</span> <span class="n">lsq_gna</span><span class="p">(</span><span class="n">initials</span><span class="p">,</span> <span class="n">cost_fun</span><span class="p">,</span> <span class="n">args</span><span class="o">=</span><span class="p">(</span><span class="n">other_args</span><span class="p">,))</span>
 
 <span class="c1"># single levenberg-marquardt</span>
 <span class="kn">from</span> <span class="nn">torchimize.functions</span> <span class="kn">import</span> <span class="n">lsq_lma</span>
 <span class="n">coeffs_list</span> <span class="o">=</span> <span class="n">lsq_lma</span><span class="p">(</span><span class="n">initials</span><span class="p">,</span> <span class="n">function</span><span class="o">=</span><span class="n">cost_fun</span><span class="p">,</span> <span class="n">jac_function</span><span class="o">=</span><span class="n">jac_fun</span><span class="p">,</span> <span class="n">args</span><span class="o">=</span><span class="p">(</span><span class="n">other_args</span><span class="p">,))</span>
+
+<span class="c1"># parallel gradient descent for several optimization problems at multiple costs</span>
+<span class="kn">from</span> <span class="nn">torchimize.functions</span> <span class="kn">import</span> <span class="n">gradient_descent_parallel</span>
+<span class="n">coeffs_list</span> <span class="o">=</span> <span class="n">gradient_descent_parallel</span><span class="p">(</span>
+                    <span class="n">p</span> <span class="o">=</span> <span class="n">initials_batch</span><span class="p">,</span>
+                    <span class="n">function</span> <span class="o">=</span> <span class="n">multi_cost_fun_batch</span><span class="p">,</span>
+                    <span class="n">jac_function</span> <span class="o">=</span> <span class="n">multi_jac_fun_batch</span><span class="p">,</span>
+                    <span class="n">args</span> <span class="o">=</span> <span class="p">(</span><span class="n">other_args</span><span class="p">,),</span>
+                    <span class="n">wvec</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="mi">5</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="s1">&#39;cuda&#39;</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">initials_batch</span><span class="o">.</span><span class="n">dtype</span><span class="p">),</span>
+                    <span class="n">ftol</span> <span class="o">=</span> <span class="mf">1e-8</span><span class="p">,</span>
+                    <span class="n">ptol</span> <span class="o">=</span> <span class="mf">1e-8</span><span class="p">,</span>
+                    <span class="n">gtol</span> <span class="o">=</span> <span class="mf">1e-8</span><span class="p">,</span>
+                    <span class="n">l</span> <span class="o">=</span> <span class="mf">1.</span><span class="p">,</span>
+                    <span class="n">max_iter</span> <span class="o">=</span> <span class="mi">80</span><span class="p">,</span>
+                <span class="p">)</span>
 
 <span class="c1"># parallel gauss-newton for several optimization problems at multiple costs</span>
 <span class="kn">from</span> <span class="nn">torchimize.functions</span> <span class="kn">import</span> <span class="n">lsq_gna_parallel</span>
