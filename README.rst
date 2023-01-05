@@ -106,11 +106,11 @@ For further details, see the |apidoc|_.
     :target: https://coveralls.io/github/hahnec/torchimize
     :width: 98
 
-.. |tests_develop| image:: https://img.shields.io/github/workflow/status/hahnec/torchimize/torchimize%20unit%20tests/develop?label=tests%20on%20develop
+.. |tests_develop| image:: https://img.shields.io/github/actions/workflow/status/hahnec/color-matcher/gh_actions.yml?branch=develop&style=square
     :target: https://github.com/hahnec/torchimize/actions/
     :width: 150
 
-.. |tests_master| image:: https://img.shields.io/github/workflow/status/hahnec/torchimize/torchimize%20unit%20tests/master?label=tests%20on%20master
+.. |tests_master| image:: https://img.shields.io/github/actions/workflow/status/hahnec/color-matcher/gh_actions.yml?branch=master&style=square
     :target: https://github.com/hahnec/torchimize/actions/
     :width: 150
 
