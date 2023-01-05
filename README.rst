@@ -106,13 +106,13 @@ For further details, see the |apidoc|_.
     :target: https://coveralls.io/github/hahnec/torchimize
     :width: 98
 
-.. |tests_develop| image:: https://img.shields.io/github/actions/workflow/status/hahnec/color-matcher/gh_actions.yml?branch=develop&style=square
+.. |tests_develop| image:: https://img.shields.io/github/actions/workflow/status/hahnec/color-matcher/gh_actions.yml?branch=develop&style=square&label=develop
     :target: https://github.com/hahnec/torchimize/actions/
-    :width: 80
+    :width: 85
 
-.. |tests_master| image:: https://img.shields.io/github/actions/workflow/status/hahnec/color-matcher/gh_actions.yml?branch=master&style=square
+.. |tests_master| image:: https://img.shields.io/github/actions/workflow/status/hahnec/color-matcher/gh_actions.yml?branch=master&style=square&label=master
     :target: https://github.com/hahnec/torchimize/actions/
-    :width: 80
+    :width: 85
 
 .. |license| image:: https://img.shields.io/badge/License-GPL%20v3.0-orange.svg?logoWidth=40
     :target: https://www.gnu.org/licenses/gpl-3.0.en.html
