@@ -131,7 +131,7 @@ def newton_raphson_step(
     jc = jac_function(p)
     f = torch.einsum('bcp,c->bp', fc, wvec)
     j = torch.einsum('bcpi,c->bpi', jc, wvec)
-    h = torch.linalg.lstsq(j.double(), f.double(), rcond=None, driver=None)[0].to(dtype=p.dtype)
+    h = torch.linalg.lstsq(j.double(), f.double(), rcond=None, driver=None)[0]
     p -= l*h
 
     return p, f, h

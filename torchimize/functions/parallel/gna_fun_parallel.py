@@ -132,7 +132,7 @@ def gauss_newton_step(
     """
 
     p, f, g, H = newton_step_parallel(p, function, jac_function, wvec)
-    h = torch.linalg.lstsq(H.double(), g.double(), rcond=None, driver=None)[0].to(dtype=p.dtype)
+    h = torch.linalg.lstsq(H.double(), g.double(), rcond=None, driver=None)[0]
     p -= l*h
 
     return p, f, g, h, H

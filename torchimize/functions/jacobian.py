@@ -54,7 +54,7 @@ def jacobian_approx_loop(p, f, dp=1e-8, args=()):
 
     for j in range(n):
         dpj = abs(p[j]) * dp if p[j] != 0 else dp
-        p_plus = torch.Tensor([(pi if k != j else pi + dpj) for k, pi in enumerate(p)]).to(p.device)
+        p_plus = torch.tensor([(pi if k != j else pi + dpj) for k, pi in enumerate(p)], device=p.device)
         jac[j] = (fun(p_plus) - fun(p)) / dpj
 
     return jac if len(args) == 0 else jac.T
