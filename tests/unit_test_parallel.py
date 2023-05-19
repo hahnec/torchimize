@@ -141,6 +141,31 @@ class ParallelOptimizationTest(unittest.TestCase):
             self.eps_gna = torch.round(eps, decimals=4)
             self.assertTrue(self.eps_gna/len(self.gt_params) < 1, 'Error exceeded 1')
 
+    def test_gda_emg_plain(self):
+
+        from torchimize.functions.parallel.gda_fun_parallel import gradient_descent_parallel_plain
+
+        for p in [self.batch_initials.clone().float(), self.batch_initials.clone().double()]:
+
+            multi_cost_batch_args = lambda p: self.multi_cost_batch(p_batch=p, t=self.t.to(dtype=p.dtype), y=self.batch_data_channels.to(dtype=p.dtype))
+            multi_jaco_batch_args = lambda p: self.multi_jaco_batch(p_batch=p, t=self.t.to(dtype=p.dtype), data=self.batch_data_channels.to(dtype=p.dtype))
+
+            coeffs = gradient_descent_parallel_plain(
+                p = p,
+                function = multi_cost_batch_args,
+                jac_function = multi_jaco_batch_args,
+                wvec = torch.ones(2, device=self.device, dtype=p.dtype, requires_grad=False),
+                l = 1,
+                max_iter = 99,
+            )
+
+            # assertion
+            ret_params = torch.allclose(coeffs.double(), self.gt_params, atol=1e-1)
+            self.assertTrue(ret_params, 'Coefficients deviate')
+            eps = torch.sum(multi_cost_batch_args(coeffs.double())).cpu()
+            self.eps_gna = torch.round(eps, decimals=4)
+            self.assertTrue(self.eps_gna/len(self.gt_params) < 1, 'Error exceeded 1')
+
     def test_gradient_descent_emg_conditions(self):
 
         from torchimize.functions.parallel.gda_fun_parallel import gradient_descent_parallel
@@ -266,6 +291,7 @@ class ParallelOptimizationTest(unittest.TestCase):
 
         self.test_fun_dims()
         self.test_gna_emg_plain()
+        self.test_gda_emg_plain()
         self.test_gradient_descent_emg_conditions()
         self.test_gna_emg_conditions()
         self.test_lma_emg_conditions()
