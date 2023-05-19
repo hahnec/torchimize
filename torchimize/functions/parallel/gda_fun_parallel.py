@@ -131,7 +131,14 @@ def newton_raphson_step(
     jc = jac_function(p)
     f = torch.einsum('bcp,c->bp', fc, wvec)
     j = torch.einsum('bcpi,c->bpi', jc, wvec)
-    h = torch.linalg.lstsq(j.double(), f.double(), rcond=None, driver=None)[0]
+    try:
+        h = torch.linalg.lstsq(j.double(), f.double(), rcond=None, driver=None)[0].to(dtype=p.dtype)
+    except torch._C._LinAlgError:
+        jmin_rank = min(j.shape[1:])
+        rank_mask = torch.linalg.matrix_rank(j) < jmin_rank
+        j[rank_mask] = torch.eye(*j.shape[1:], dtype=j.dtype, device=j.device)
+        h = torch.linalg.lstsq(j.double(), f.double(), rcond=None, driver=None)[0].to(dtype=p.dtype)
+
     p -= l*h
 
     return p, f, h
