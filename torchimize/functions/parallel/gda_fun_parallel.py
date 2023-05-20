@@ -115,7 +115,7 @@ def newton_raphson_step(
         jac_function: Callable,
         wvec: torch.Tensor,
         l: float = 1.,
-    ) -> Tuple[torch.Tensor, torch.Tensor, torch.Tensor, torch.Tensor]:
+    ) -> Tuple[torch.Tensor, torch.Tensor, torch.Tensor]:
     """
     Gradient Descent step function for parallel least-squares fitting of non-linear functions
 
@@ -124,7 +124,7 @@ def newton_raphson_step(
     :param jac_fun: user-provided Jacobian function which takes p (and additional arguments) as input
     :param wvec: weights vector used in reduction of multiple costs
     :param l: step size damping parameter
-    :return: list of results
+    :return: tuple of results
     """
 
     fc = function(p)
