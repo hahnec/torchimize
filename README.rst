@@ -108,7 +108,7 @@ For further details, see the |apidoc|_.
 
 .. |tests_develop| image:: https://img.shields.io/github/actions/workflow/status/hahnec/torchimize/gh_actions.yaml?branch=develop&style=square&label=develop
     :target: https://github.com/hahnec/torchimize/actions/
-    :width: 100
+    :width: 105
 
 .. |tests_master| image:: https://img.shields.io/github/actions/workflow/status/hahnec/torchimize/gh_actions.yaml?branch=master&style=square&label=master
     :target: https://github.com/hahnec/torchimize/actions/
