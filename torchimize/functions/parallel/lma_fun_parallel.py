@@ -92,26 +92,30 @@ def lsq_lma_parallel(
     while len(p_list) < max_iter:
 
         # levenberg-marquardt step
-        p, f, g, H = newton_step_parallel(p, fun, jac_fun, wvec)
+        pn, f, g, H = newton_step_parallel(p, fun, jac_fun, wvec)
         D = lm_dg_step(H, D)
         Hu = H+u[:, None, None]*D
         h = -torch.linalg.lstsq(Hu.double(), g.double(), rcond=None, driver=None)[0].to(dtype=p.dtype)
-        f_h = fun(p+h)
+        f_h = fun(pn+h)
         rho_nom = torch.einsum('bcp,bci->bc', f, f).sum(1) - torch.einsum('bcp,bci->bc', f_h, f_h).sum(1)
         rho_denom = torch.einsum('bnp,bni->bi', h[..., None], (u[:, None]*h-g)[..., None])[..., 0]
         rho = rho_nom / rho_denom
         rho[rho_denom==0] = sinf[(rho_nom > 0).type(torch.int64)][rho_denom==0]
         u, v = lm_uv_step(rho, u, v)
-        p[rho>0, ...] += h[rho>0, ...]
-        p_list.append(p.clone())
+        pn[rho>0, ...] += h[rho>0, ...]
 
-        # stop conditions
-        gcon = torch.max(abs(g)) < gtol
-        pcon = (h**2).sum()**.5 < ptol*(ptol + (p**2).sum()**.5)
-        fcon = ((f_prev-f)**2).sum() < ((ftol*f)**2).sum() if (rho > 0).sum() > 0 and f_prev.shape == f.shape else False
+        # batched stop conditions
+        gcon = torch.max(abs(g), dim=-1)[0] < gtol
+        pcon = (h**2).sum(-1)**.5 < ptol*(ptol + (p**2).sum(-1)**.5)
+        fcon = ((f_prev-f)**2).sum((-1,-2)) < ((ftol*f)**2).sum((-1,-2)) if (rho > 0).sum() > 0 and f_prev.shape == f.shape else torch.zeros_like(gcon)
         f_prev = f.clone()
 
-        if gcon or pcon or fcon:
+        # update only parameters, which have not converged yet
+        converged = gcon | pcon | fcon
+        p[~converged] = pn[~converged]
+        p_list.append(p.clone())
+        
+        if converged.all():
             break
 
     return p_list

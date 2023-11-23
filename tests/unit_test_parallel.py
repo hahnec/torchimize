@@ -179,9 +179,9 @@ class ParallelOptimizationTest(unittest.TestCase):
                 args = (self.t.to(dtype=p.dtype), self.batch_data_channels.to(dtype=p.dtype)),
                 wvec = torch.ones(2, device=self.device, dtype=p.dtype, requires_grad=False),
                 l = 1,
-                ftol = 1e-8,
-                ptol = 1e-8,
-                gtol = 1e-8,
+                ftol = 1e-7,
+                ptol = 1e-7,
+                gtol = 1e-7,
                 max_iter = 99,
             )
 
@@ -205,9 +205,9 @@ class ParallelOptimizationTest(unittest.TestCase):
                 args = (self.t.to(dtype=p.dtype), self.batch_data_channels.to(dtype=p.dtype)),
                 wvec = torch.ones(2, device=self.device, dtype=p.dtype, requires_grad=False),
                 l = 1,
-                ftol = 1e-8,
-                ptol = 1e-8,
-                gtol = 1e-8,
+                ftol = 1e-7,
+                ptol = 1e-7,
+                gtol = 1e-7,
                 max_iter = 99,
             )
 
@@ -235,9 +235,9 @@ class ParallelOptimizationTest(unittest.TestCase):
                     args = (self.t.to(dtype=p.dtype), self.batch_data_channels.to(dtype=p.dtype)),
                     wvec = torch.ones(2, device=self.device, dtype=p.dtype, requires_grad=False),
                     meth = m,
-                    ftol = 1e-8,
-                    ptol = 1e-8,
-                    gtol = 1e-8,
+                    ftol = 1e-7,
+                    ptol = 1e-7,
+                    gtol = 1e-7,
                     max_iter = 99,
                 )
 

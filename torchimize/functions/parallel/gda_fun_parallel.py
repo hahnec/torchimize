@@ -67,17 +67,21 @@ def gradient_descent_parallel(
     p_list = []
     f_prev = torch.zeros(1, device=p.device, dtype=p.dtype)
     while len(p_list) < max_iter:
-        p, f, h = newton_raphson_step(p, fun, jac_fun, wvec, l)
-        p_list.append(p.clone())
+        pn, f, h = newton_raphson_step(p, fun, jac_fun, wvec, l)
         g = h/l
 
-        # stop conditions
-        gcon = torch.max(abs(g)) < gtol
-        pcon = (h**2).sum()**.5 < ptol*(ptol + (p**2).sum()**.5)
-        fcon = ((f_prev-f)**2).sum() < ((ftol*f)**2).sum() if f_prev.shape == f.shape else False
+        # batched stop conditions
+        gcon = torch.max(abs(g), dim=-1)[0] < gtol
+        pcon = (h**2).sum(-1)**.5 < ptol*(ptol + (p**2).sum(-1)**.5)
+        fcon = ((f_prev-f)**2).sum((-1,-2)) < ((ftol*f)**2).sum((-1,-2)) if f_prev.shape == f.shape else torch.zeros_like(gcon)
         f_prev = f.clone()
+
+        # update only parameters, which have not converged yet
+        converged = gcon | pcon | fcon
+        p[~converged] = pn[~converged]
+        p_list.append(p.clone())
         
-        if gcon or pcon or fcon:
+        if converged.all():
             break
 
     return p_list
