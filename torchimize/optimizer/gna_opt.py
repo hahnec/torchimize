@@ -4,12 +4,6 @@ import torch.nn as nn
 from torch.optim.optimizer import Optimizer
 from typing import List
 
-try:
-    from torch.nn.utils import stateless
-except ImportError:
-    from torch.nn.utils import _stateless as stateless
-
-
 
 class GNA(Optimizer):
     r"""Implements Gauss-Newton.
@@ -68,7 +62,7 @@ class GNA(Optimizer):
             if self.hessian_approx:
                 # vectorized jacobian (https://github.com/pytorch/pytorch/issues/49171)
                 def func(*params: torch.Tensor):
-                    out = stateless.functional_call(self._model, {n: p for n, p in zip(keys, params)}, x)
+                    out = torch.func.functional_call(self._model, {n: p for n, p in zip(keys, params)}, x)
                     return out
                 self._j_list: tuple[torch.Tensor] = torch.autograd.functional.jacobian(func, values, create_graph=False)    # NxCxBxCxHxW
                 # create hessian approximation
@@ -83,7 +77,7 @@ class GNA(Optimizer):
             else:
                 # vectorized hessian (https://github.com/pytorch/pytorch/issues/49171)
                 def func(*params: torch.Tensor):
-                    out: torch.Tensor = stateless.functional_call(self._model, {n: p for n, p in zip(keys, params)}, x)
+                    out: torch.Tensor = torch.func.functional_call(self._model, {n: p for n, p in zip(keys, params)}, x)
                     return out.square().sum()
                 self._h_list: tuple[torch.Tensor] = torch.autograd.functional.hessian(func, tuple(self._model.parameters()), create_graph=False)
                 self._h_list = [self._h_list[i][i] for i in range(len(self._h_list))] # filter j-th element
