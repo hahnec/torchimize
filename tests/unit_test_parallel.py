@@ -227,28 +227,31 @@ class ParallelOptimizationTest(unittest.TestCase):
         for p in [self.batch_initials.clone().float(), self.batch_initials.clone().double()]:
             
             for m in ['lev']:
+                
+                # test analytical and numerical jacobian approach
+                for jaco in [self.multi_jaco_batch, None]:
 
-                coeffs = lsq_lma_parallel(
-                    p = p,
-                    function = self.multi_cost_batch,
-                    jac_function = self.multi_jaco_batch,
-                    args = (self.t.to(dtype=p.dtype), self.batch_data_channels.to(dtype=p.dtype)),
-                    wvec = torch.ones(2, device=self.device, dtype=p.dtype, requires_grad=False),
-                    meth = m,
-                    ftol = 1e-7,
-                    ptol = 1e-7,
-                    gtol = 1e-7,
-                    max_iter = 99,
-                )
+                    coeffs = lsq_lma_parallel(
+                        p = p,
+                        function = self.multi_cost_batch,
+                        jac_function = jaco,
+                        args = (self.t.to(dtype=p.dtype), self.batch_data_channels.to(dtype=p.dtype)),
+                        wvec = torch.ones(2, device=self.device, dtype=p.dtype, requires_grad=False),
+                        meth = m,
+                        ftol = 1e-8,
+                        ptol = 1e-8,
+                        gtol = 1e-8,
+                        max_iter = 99,
+                    )
 
-                # assertion
-                self.iter_lma_cond = len(coeffs)
-                self.assertTrue(self.iter_lma_cond < 100, 'Number of iterations exceeded 100')
-                ret_params = torch.allclose(coeffs[-1].double(), self.gt_params, atol=1e-1)
-                self.assertTrue(ret_params, 'Coefficients deviate')
-                eps = torch.sum(self.cost_batch(coeffs[-1].double(), t=self.t, y=self.batch_data_channels)).cpu()
-                self.eps_lma_cond = torch.round(eps, decimals=4)
-                self.assertTrue(self.eps_lma_cond/len(self.gt_params) < 1, 'Error exceeded 1')
+                    # assertion
+                    self.iter_lma_cond = len(coeffs)
+                    self.assertTrue(self.iter_lma_cond < 100, 'Number of iterations exceeded 100')
+                    ret_params = torch.allclose(coeffs[-1].double(), self.gt_params, atol=1e-1)
+                    self.assertTrue(ret_params, 'Coefficients deviate')
+                    eps = torch.sum(self.cost_batch(coeffs[-1].double(), t=self.t, y=self.batch_data_channels)).cpu()
+                    self.eps_lma_cond = torch.round(eps, decimals=4)
+                    self.assertTrue(self.eps_lma_cond/len(self.gt_params) < 1, 'Error exceeded 1')
 
     def scipy_fit(self):
 
