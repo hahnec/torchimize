@@ -5,14 +5,13 @@ from torch.optim.optimizer import Optimizer
 from typing import List
 
 from distutils.version import LooseVersion
-if LooseVersion(torch.__version__) > LooseVersion('2.0.0'):
+if LooseVersion(torch.__version__) >= LooseVersion('2.0.0'):
     from torch.func import functional_call
 else:
     try:
         from torch.nn.utils.stateless import functional_call
     except ImportError:
         from torch.nn.utils._stateless import functional_call
-
 
 
 class GNA(Optimizer):
