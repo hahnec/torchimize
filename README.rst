@@ -17,8 +17,8 @@ Installation
 Kick-Start
 ==========
 
-Cost Optimization
------------------
+Single Cost Optimization
+------------------------
 
 .. code-block:: python
 
@@ -33,6 +33,11 @@ Cost Optimization
     # single levenberg-marquardt
     from torchimize.functions import lsq_lma
     coeffs_list = lsq_lma(initials, function=cost_fun, jac_function=jac_fun, args=(other_args,))
+
+Parallel Cost Optimization
+--------------------------
+
+.. code-block:: python
 
     # parallel gradient descent for several optimization problems at multiple costs
     from torchimize.functions import gradient_descent_parallel
