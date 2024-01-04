@@ -18,7 +18,7 @@ import torch
 from typing import Union, Callable, Tuple, List
 import warnings
 
-from torchimize.functions.jacobian import jacobian_approx_t
+from torchimize.functions.jacobian import batch_jacobian_approx_t
 from torchimize.functions.parallel.newton_parallel import newton_step_parallel
 
 
@@ -58,7 +58,7 @@ def lsq_gna_parallel(
 
     if jac_function is None:
         # use numerical Jacobian if analytical is not provided
-        jac_fun = lambda p: jacobian_approx_t(p, f=fun)
+        jac_fun = lambda p: batch_jacobian_approx_t(p, f=fun)
     else:
         jac_fun = lambda p: jac_function(p, *args)
 

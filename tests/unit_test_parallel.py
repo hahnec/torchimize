@@ -172,53 +172,59 @@ class ParallelOptimizationTest(unittest.TestCase):
 
         for p in [self.batch_initials.clone().float(), self.batch_initials.clone().double()]:
 
-            coeffs = gradient_descent_parallel(
-                p = p,
-                function = self.multi_cost_batch,
-                jac_function = self.multi_jaco_batch,
-                args = (self.t.to(dtype=p.dtype), self.batch_data_channels.to(dtype=p.dtype)),
-                wvec = torch.ones(2, device=self.device, dtype=p.dtype, requires_grad=False),
-                l = 1,
-                ftol = 1e-7,
-                ptol = 1e-7,
-                gtol = 1e-7,
-                max_iter = 99,
-            )
+            # test numerical and analytical jacobian
+            for jaco in [None, self.multi_jaco_batch]:
 
-            # assertion
-            self.iter_gd_cond = len(coeffs)
-            self.assertTrue(self.iter_gd_cond < 100, 'Number of iterations exceeded 100')
-            ret_params = torch.allclose(coeffs[-1].double(), self.gt_params, atol=1e-1)
-            self.assertTrue(ret_params, 'Coefficients deviate')
-            eps = torch.sum(self.cost_batch(coeffs[-1].double(), t=self.t, y=self.batch_data_channels)).cpu()
-            self.eps_gd_cond = torch.round(eps, decimals=4)
-            self.assertTrue(self.eps_gd_cond/len(self.gt_params) < 1, 'Error exceeded 1')
+                coeffs = gradient_descent_parallel(
+                    p = p,
+                    function = self.multi_cost_batch,
+                    jac_function = jaco,
+                    args = (self.t.to(dtype=p.dtype), self.batch_data_channels.to(dtype=p.dtype)),
+                    wvec = torch.ones(2, device=self.device, dtype=p.dtype, requires_grad=False),
+                    l = 1,
+                    ftol = 1e-5 if jaco is None else 1e-8,
+                    ptol = 1e-5 if jaco is None else 1e-8,
+                    gtol = 1e-5 if jaco is None else 1e-8,
+                    max_iter = 99,
+                )
+
+                # assertion
+                self.iter_gd_cond = len(coeffs)
+                self.assertTrue(self.iter_gd_cond < 100, 'Number of iterations exceeded 100')
+                ret_params = torch.allclose(coeffs[-1].double(), self.gt_params, atol=1e-1)
+                self.assertTrue(ret_params, 'Coefficients deviate')
+                eps = torch.sum(self.cost_batch(coeffs[-1].double(), t=self.t, y=self.batch_data_channels)).cpu()
+                self.eps_gd_cond = torch.round(eps, decimals=4)
+                self.assertTrue(self.eps_gd_cond/len(self.gt_params) < 1, 'Error exceeded 1')
 
     def test_gna_emg_conditions(self):
 
         for p in [self.batch_initials.clone().float(), self.batch_initials.clone().double()]:
 
-            coeffs = lsq_gna_parallel(
-                p = p,
-                function = self.multi_cost_batch,
-                jac_function = self.multi_jaco_batch,
-                args = (self.t.to(dtype=p.dtype), self.batch_data_channels.to(dtype=p.dtype)),
-                wvec = torch.ones(2, device=self.device, dtype=p.dtype, requires_grad=False),
-                l = 1,
-                ftol = 1e-7,
-                ptol = 1e-7,
-                gtol = 1e-7,
-                max_iter = 99,
-            )
+            # test numerical and analytical jacobian
+            for jaco in [None, self.multi_jaco_batch]:
 
-            # assertion
-            self.iter_gna_cond = len(coeffs)
-            self.assertTrue(self.iter_gna_cond < 100, 'Number of iterations exceeded 100')
-            ret_params = torch.allclose(coeffs[-1].double(), self.gt_params, atol=1e-1)
-            self.assertTrue(ret_params, 'Coefficients deviate')
-            eps = torch.sum(self.cost_batch(coeffs[-1].double(), t=self.t, y=self.batch_data_channels)).cpu()
-            self.eps_gna_cond = torch.round(eps, decimals=4)
-            self.assertTrue(self.eps_gna_cond/len(self.gt_params) < 1, 'Error exceeded 1')
+                coeffs = lsq_gna_parallel(
+                    p = p,
+                    function = self.multi_cost_batch,
+                    jac_function = jaco,
+                    args = (self.t.to(dtype=p.dtype), self.batch_data_channels.to(dtype=p.dtype)),
+                    wvec = torch.ones(2, device=self.device, dtype=p.dtype, requires_grad=False),
+                    l = 1,
+                    ftol = 1e-5 if jaco is None else 1e-8,
+                    ptol = 1e-5 if jaco is None else 1e-8,
+                    gtol = 1e-5 if jaco is None else 1e-8,
+                    max_iter = 99,
+                )
+
+                # assertion
+                self.iter_gna_cond = len(coeffs)
+                self.assertTrue(self.iter_gna_cond < 100, 'Number of iterations exceeded 100')
+                ret_params = torch.allclose(coeffs[-1].double(), self.gt_params, atol=1e-1)
+                self.assertTrue(ret_params, 'Coefficients deviate')
+                eps = torch.sum(self.cost_batch(coeffs[-1].double(), t=self.t, y=self.batch_data_channels)).cpu()
+                self.eps_gna_cond = torch.round(eps, decimals=4)
+                self.assertTrue(self.eps_gna_cond/len(self.gt_params) < 1, 'Error exceeded 1')
 
     def test_lma_emg_conditions(self):
 
@@ -228,8 +234,8 @@ class ParallelOptimizationTest(unittest.TestCase):
             
             for m in ['lev']:
                 
-                # test analytical and numerical jacobian approach
-                for jaco in [self.multi_jaco_batch, None]:
+                # test numerical and analytical jacobian
+                for jaco in [None, self.multi_jaco_batch]:
 
                     coeffs = lsq_lma_parallel(
                         p = p,
@@ -238,9 +244,9 @@ class ParallelOptimizationTest(unittest.TestCase):
                         args = (self.t.to(dtype=p.dtype), self.batch_data_channels.to(dtype=p.dtype)),
                         wvec = torch.ones(2, device=self.device, dtype=p.dtype, requires_grad=False),
                         meth = m,
-                        ftol = 1e-8,
-                        ptol = 1e-8,
-                        gtol = 1e-8,
+                        ftol = 1e-5 if jaco is None else 1e-8,
+                        ptol = 1e-5 if jaco is None else 1e-8,
+                        gtol = 1e-5 if jaco is None else 1e-8,
                         max_iter = 99,
                     )
 

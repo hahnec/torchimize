@@ -25,6 +25,22 @@ def jacobian_approx_t(p, f, create_graph=False):
     :param create_graph: If True, the Jacobian will be computed in a differentiable manner.
     :return: jacobian
     """
+
+    try:
+        jac = torch.autograd.functional.jacobian(f, p, create_graph=create_graph, vectorize=True)
+    except RuntimeError:
+        jac = torch.autograd.functional.jacobian(f, p, create_graph=create_graph, strict=True, vectorize=False)
+
+    return jac
+
+def batch_jacobian_approx_t(p, f, create_graph=False):
+    """
+    Numerical approximation for the multivariate Jacobian for inputs with batch dimension
+    :param p: initial value(s)
+    :param f: function handle
+    :param create_graph: If True, the Jacobian will be computed in a differentiable manner.
+    :return: jacobian
+    """
     
     # reduce batch dim: https://discuss.pytorch.org/t/jacobian-functional-api-batch-respecting-jacobian/84571/7
     f_sum = lambda x: torch.sum(f(x), axis=0)
