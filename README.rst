@@ -97,7 +97,7 @@ Parallel Cost Optimization
 .. note::
     For simultaneous minimization of ``B`` optimization problems at a multiple of ``C`` costs, the ``function`` and ``jac_function`` arguments require to return a torch.Tensor type of ``B x C x N`` and ``B x C x N x P``, respectively. Here, ``N`` is the residual dimension and ``P`` represents the sought parameter number in each ``B x C``.
 
-For further details, see the |apidoc|_.
+For further details, see the `API documentation <https://hahnec.github.io/torchimize/build/html/apidoc.html>`_.
 
 .. substitutions
 
@@ -128,9 +128,6 @@ For further details, see the |apidoc|_.
     :target: https://pypi.org/project/torchimize/
     :alt: PyPI Downloads
     :width: 162
-
-.. |apidoc| replace:: **API documentation**
-.. _apidoc: https://hahnec.github.io/torchimize/build/html/apidoc.html
 
 Citation
 ========
